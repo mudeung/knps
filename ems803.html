@@ -338,7 +338,7 @@ document.getElementById("recordForm").addEventListener("submit", (e) => {
     `<div class="board-item">${text}</div>`;
 
   /* Google Sheet 전송 */
-  fetch("https://script.google.com/macros/s/AKfycbxm_oLeGMIGh5PRokCURztVx6-1Ijug2KtuGbsFH-cZVOKE5LgaKDnLbTgFl2sWWDdkwA/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbxtstQehEAuNwF6ZAJskL_HWQk-UaWr5WHMPEghyuFvPzVtjWn_U_Dssk9rFCXJIkVUaw/exec", {
     method: "POST",
     body: JSON.stringify(data)
   }).catch(() => {});
