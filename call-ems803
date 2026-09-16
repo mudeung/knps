@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>🆘 무등산 산악사고 신고/접수/대응 상황판</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ff9e145029506d6e4c72d1f2b01ea424&libraries=services"></script>
+
+<style>
+body{margin:0;font-family:Arial;background:#111;color:#fff;}
+header{background:#b71c1c;padding:15px;text-align:center;font-size:20px;}
+.container{padding:15px;}
+#map{width:100%;height:350px;margin-bottom:15px;border-radius:6px;}
+
+.card{background:#1e1e1e;padding:12px;margin-bottom:10px;border-radius:6px;cursor:pointer;}
+.card.done{opacity:0.5;background:#2b2b2b;}
+
+.stats{display:flex;gap:10px;margin-bottom:15px;font-size:16px;}
+.stat-box{flex:1;padding:10px;border-radius:6px;background:#222;text-align:center;}
+.stat-box span{font-size:24px;font-weight:bold;display:block;}
+
+#filterBox{display:flex;gap:10px;margin-bottom:10px;align-items:center;justify-content:flex-end;}
+#modalOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:9999;}
+#modalContent{background:#222;padding:20px;border-radius:8px;max-width:400px;width:90%;}
+#modalContent h3{margin-top:0;}
+#closeModal{cursor:pointer;background:#e53935;border:none;padding:6px 12px;color:#fff;border-radius:4px;margin-top:10px;}
+
+#sheetTableContainer{margin-top:20px;}
+#sheetTable th, #sheetTable td{padding:6px;text-align:center;}
+#sheetTable tr:nth-child(even){background:#1a1a1a;}
+</style>
+</head>
+
+<body>
+
+
+<header>🆘 무등산 산악사고 신고/접수/대응 상황판</header>
+
+<div class="container">
+
+<div class="stats">
+  <div class="stat-box">🚑 응급환자<span id="statEmergency">0</span></div>
+  <div class="stat-box">🚓 구조출동<span id="statDispatch">0</span></div>
+  <div class="stat-box">🆘 조난<span id="statLost">0</span></div>
+  <div class="stat-box">✏ 기타<span id="statOther">0</span></div>
+</div>
+
+<div id="map"></div>
+<div id="listArea"></div>
+
+<div id="sheetTableContainer">
+  <table id="sheetTable" border="1" style="width:100%;color:#fff;">
+    <thead>
+      <tr>
+        <th>시간</th><th>유형</th><th>주소</th><th>전화</th><th>증상</th><th>상태</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+</div>
+
+<div id="modalOverlay">
+  <div id="modalContent">
+    <h3>상세 정보</h3>
+    <div id="modalBody"></div>
+    <button onclick="closeModal()">닫기</button>
+  </div>
+</div>
+
+<script>
+
+
+const API_URL="https://script.google.com/macros/s/AKfycbwUbacHm34YkWh--zL_e590P6h4S5wQo3iF8tCVZu71ZaTunTwdZ1TMLVqkyuHu-izW/exec";
+
+let map, markers=[], allData=[];
+let lastDataLength = 0;
+
+window.onload=function(){
+  initMap();
+  loadData();
+  setInterval(loadData,10000);
+};
+
+/* 시간 */
+function parseKST(dateStr){
+  if(!dateStr) return null;
+  const d = new Date(dateStr);
+  if(isNaN(d)) return null;
+  return d;
+}
+
+function formatTime(date){
+  return date ? date.toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}) : "";
+}
+
+/* 지도 */
+function initMap(){
+  map=new kakao.maps.Map(document.getElementById("map"),{
+    center:new kakao.maps.LatLng(35.1345,126.9902),
+    level:6
+  });
+}
+
+/* 모달 */
+function showModal(item){
+  document.getElementById("modalOverlay").style.display="flex";
+  document.getElementById("modalBody").innerHTML=`
+    🕒 ${formatTime(parseKST(item.time))}<br>
+    🚨 ${item.type}<br>
+    🏠 ${item.address}<br>
+    📞 ${item.phone||''}<br>
+    📝 ${item.symptom||''}<br>
+    상태: ${item.status||''}
+  `;
+}
+
+function closeModal(){
+  document.getElementById("modalOverlay").style.display="none";
+}
+
+/* 통계 */
+function updateStats(data){
+  let emergency=0, dispatch=0, lost=0, other=0;
+
+  data.forEach(item=>{
+    const t = (item.type || "");
+
+    if(t.includes("응급")){
+      emergency++;
+    }
+    else if(t.includes("구조") || t.includes("산악사고")){
+      dispatch++;
+    }
+    else if(t.includes("조난") || t.includes("실종")){
+      lost++;
+    }
+    else{
+      other++;
+    }
+  });
+
+  document.getElementById("statEmergency").innerText = emergency;
+  document.getElementById("statDispatch").innerText = dispatch;
+  document.getElementById("statLost").innerText = lost;
+  document.getElementById("statOther").innerText = other;
+}
+
+/* 🚨 긴급 알림 */
+function triggerAlert(item){
+
+  const msg = `🚨 긴급 접수
+유형: ${item.type}
+주소: ${item.address}
+상태: ${item.status || ""}`;
+
+  // 브라우저 알림
+  if("Notification" in window){
+    if(Notification.permission === "granted"){
+      new Notification("산악사고 긴급", { body: item.type });
+    } else {
+      Notification.requestPermission();
+    }
+  }
+
+  // 화면 팝업
+  const popup=document.createElement("div");
+  popup.style.position="fixed";
+  popup.style.top="20px";
+  popup.style.right="20px";
+  popup.style.background="#b71c1c";
+  popup.style.color="#fff";
+  popup.style.padding="12px";
+  popup.style.borderRadius="8px";
+  popup.style.zIndex="99999";
+  popup.style.maxWidth="260px";
+  popup.style.boxShadow="0 0 10px rgba(0,0,0,0.5)";
+  popup.style.whiteSpace="pre-line";
+
+  popup.innerText=msg;
+
+  document.body.appendChild(popup);
+
+  setTimeout(()=>popup.remove(),5000);
+}
+
+/* 렌더 */
+function renderData(data){
+
+  document.getElementById("listArea").innerHTML="";
+
+  markers.forEach(m=>m.setMap(null));
+  markers=[];
+
+  updateStats(data);
+
+  let bounds=new kakao.maps.LatLngBounds();
+
+  data.forEach(item=>{
+    const lat=parseFloat(item.lat||item.latitude);
+    const lng=parseFloat(item.lng||item.longitude);
+
+    if(!isNaN(lat)&&!isNaN(lng)){
+
+      let iconUrl;
+
+      const t = (item.type || "");
+
+      if(t.includes("응급")){
+        iconUrl="https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+      }
+      else if(t.includes("구조") || t.includes("산악사고")){
+        iconUrl="https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+      }
+      else if(t.includes("조난") || t.includes("실종")){
+        iconUrl="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+      }
+      else{
+        iconUrl="https://maps.google.com/mapfiles/ms/icons/green-dot.png";
+      }
+
+      const marker=new kakao.maps.Marker({
+        map:map,
+        position:new kakao.maps.LatLng(lat,lng),
+        image:new kakao.maps.MarkerImage(iconUrl,new kakao.maps.Size(32,32))
+      });
+
+      kakao.maps.event.addListener(marker,'click',()=>showModal(item));
+
+      markers.push(marker);
+      bounds.extend(marker.getPosition());
+    }
+
+    const div=document.createElement("div");
+    div.className="card";
+    div.innerText=`${formatTime(parseKST(item.time))} | ${item.type} | ${item.address}`;
+   div.onclick=()=>{
+  showModal(item);
+
+  const lat=parseFloat(item.lat||item.latitude);
+  const lng=parseFloat(item.lng||item.longitude);
+
+  if(!isNaN(lat)&&!isNaN(lng)){
+    const moveLatLng = new kakao.maps.LatLng(lat, lng);
+
+    map.setCenter(moveLatLng);
+    map.setLevel(3); // 🔥 확대 (숫자 작을수록 확대)
+  }
+};
+
+    document.getElementById("listArea").appendChild(div);
+  });
+
+  if(markers.length>0) map.setBounds(bounds);
+
+  renderTable(data);
+}
+
+/* 테이블 */
+function renderTable(data){
+  const tbody=document.querySelector("#sheetTable tbody");
+  tbody.innerHTML="";
+
+  data.forEach(item=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${formatTime(parseKST(item.time))}</td>
+      <td>${item.type}</td>
+      <td>${item.address}</td>
+      <td>${item.phone||''}</td>
+      <td>${item.symptom||''}</td>
+      <td>${item.status||''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* 데이터 로드 + 신규 감지 */
+async function loadData(){
+  try{
+    const res=await fetch(API_URL+"?action=list");
+    let data=await res.json();
+
+    if(!Array.isArray(data)) data=[];
+
+    // 🔥 신규 데이터 감지
+    if(lastDataLength > 0 && data.length > lastDataLength){
+      const newItems = data.slice(0, data.length - lastDataLength);
+      newItems.forEach(triggerAlert);
+    }
+
+    lastDataLength = data.length;
+
+    allData=data;
+    renderData(allData);
+
+  }catch(e){
+    document.getElementById("listArea").innerText="❌ 데이터 로딩 오류";
+  }
+}
+
+</script>
+</body>
+</html>
