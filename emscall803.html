@@ -12,23 +12,17 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-
-<!-- =====================================================
-     카카오맵 SDK
-====================================================== -->
-
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ff9e145029506d6e4c72d1f2b01ea424&libraries=services"></script>
-
 
 <style>
 
-/* =====================================================
-   기본
-====================================================== */
+*{
+    box-sizing:border-box;
+}
 
 body{
     margin:0;
-    font-family:Arial,sans-serif;
+    font-family:Arial,"Noto Sans KR",sans-serif;
     background:#111;
     color:#fff;
 }
@@ -45,254 +39,189 @@ header{
     padding:15px;
 }
 
-
-/* =====================================================
-   지도
-====================================================== */
-
 #map{
     width:100%;
-
-    /* 지도 크게 */
-
     height:65vh;
-
     min-height:450px;
-
     max-height:750px;
-
     margin-bottom:15px;
-
     border-radius:6px;
-
     overflow:hidden;
+    background:#222;
 }
 
-
-/* =====================================================
-   신고 카드
-====================================================== */
+#listArea{
+    width:100%;
+}
 
 .card{
-
     background:#1e1e1e;
-
-    padding:12px;
-
+    padding:14px;
     margin-bottom:10px;
-
     border-radius:6px;
-
     border:1px solid #333;
-
 }
 
 .card.done{
-
     background:#2b2b2b;
-
-    opacity:0.6;
-
+    opacity:.65;
 }
-
-
-/* =====================================================
-   시간
-====================================================== */
 
 .time{
-
     color:#ffcc00;
-
     font-size:14px;
-
-    margin-bottom:4px;
-
+    margin-bottom:5px;
 }
 
+.elapsed{
+    font-weight:bold;
+}
 
-/* =====================================================
-   좌표
-====================================================== */
+.type{
+    margin-top:8px;
+    font-size:16px;
+    font-weight:bold;
+    color:#ff5252;
+}
+
+.info-box{
+    margin-top:10px;
+    padding:10px;
+    background:#292929;
+    border-radius:5px;
+    line-height:1.5;
+    word-break:break-word;
+}
+
+.symptom{
+    margin-top:5px;
+    color:#ddd;
+    white-space:pre-wrap;
+    word-break:break-word;
+}
 
 .coord{
-
     font-size:12px;
-
     color:#aaa;
-
-    margin-top:6px;
-
-    margin-bottom:6px;
-
+    margin-top:10px;
+    margin-bottom:7px;
 }
 
-
-/* =====================================================
-   지도 링크
-====================================================== */
-
 .maplink{
-
     color:#4fc3f7;
-
     font-size:13px;
-
     text-decoration:none;
-
     font-weight:bold;
-
 }
 
 .maplink:hover{
-
     text-decoration:underline;
-
 }
 
-
-/* =====================================================
-   처리 버튼
-====================================================== */
-
 .complete-btn{
-
     background:#2e7d32;
-
-    margin-top:8px;
-
+    margin-top:10px;
     color:#fff;
-
     border:none;
-
-    padding:7px 12px;
-
+    padding:8px 12px;
     border-radius:4px;
-
     cursor:pointer;
-
     font-weight:bold;
-
 }
 
 .complete-btn:hover{
-
-    opacity:0.8;
-
+    opacity:.8;
 }
 
+.complete-btn.finish{
+    background:#1565c0;
+}
 
-/* =====================================================
-   3분 초과 응급환자 깜빡임
-====================================================== */
+.status{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:5px;
+    font-size:13px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.status.received{
+    background:#d50000;
+    color:#fff;
+}
+
+.status.arrived{
+    background:#ef6c00;
+    color:#fff;
+}
+
+.status.done{
+    background:#777;
+    color:#fff;
+}
+
+.empty{
+    padding:25px;
+    text-align:center;
+    color:#aaa;
+    background:#1e1e1e;
+    border-radius:6px;
+}
+
+.error{
+    padding:20px;
+    background:#4a1010;
+    border:1px solid #d32f2f;
+    border-radius:6px;
+    color:#ffbdbd;
+}
 
 @keyframes blinkEmergency{
 
     0%{
-
         box-shadow:
             0 0 5px #ff1744;
-
     }
 
     50%{
-
         box-shadow:
             0 0 25px #ff1744,
             0 0 40px #ff1744;
-
     }
 
     100%{
-
         box-shadow:
             0 0 5px #ff1744;
-
     }
 
 }
 
 .card.blink{
-
-    animation:
-        blinkEmergency 1s infinite;
-
+    animation:blinkEmergency 1s infinite;
 }
 
-
-/* =====================================================
-   상태 표시
-====================================================== */
-
-.status{
-
-    display:inline-block;
-
-    padding:5px 9px;
-
-    border-radius:5px;
-
-    font-size:13px;
-
-    font-weight:bold;
-
-    margin-bottom:7px;
-
+#dogImage{
+    display:block;
+    margin:0 auto 10px;
+    max-width:100%;
 }
-
-.status.received{
-
-    background:#d50000;
-
-    color:#fff;
-
-}
-
-.status.arrived{
-
-    background:#ef6c00;
-
-    color:#fff;
-
-}
-
-.status.done{
-
-    background:#777;
-
-    color:#fff;
-
-}
-
-
-/* =====================================================
-   모바일
-====================================================== */
 
 @media(max-width:600px){
 
     header{
-
         font-size:18px;
-
         padding:13px;
-
     }
 
     .container{
-
         padding:10px;
-
     }
 
     #map{
-
         height:65vh;
-
         min-height:400px;
-
         max-height:none;
-
     }
 
 }
@@ -301,257 +230,247 @@ header{
 
 </head>
 
-
 <body>
 
-
-<!-- =====================================================
-     제목
-====================================================== -->
-
 <header>
-
     🆘 팔공산산악구조팀 산악사고 공유
-
 </header>
 
-
-<!-- =====================================================
-     알림음
-====================================================== -->
-
-<audio id="alertSound">
-
+<audio id="alertSound" preload="auto">
     <source
         src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
         type="audio/ogg"
     >
-
 </audio>
 
-
-<!-- =====================================================
-     지도
-====================================================== -->
-
 <div class="container">
-
     <div id="map"></div>
-
 </div>
 
-
-<!-- =====================================================
-     달콩이 이미지
-====================================================== -->
-
 <img
+    id="dogImage"
     src="https://mudeung.github.io/rescue/logogomir1.png"
-
     alt="달콩이 이미지"
-
-    style="
-        display:block;
-        margin:0 auto;
-        max-width:100%;
-    "
 >
-
-
-<!-- =====================================================
-     신고 목록
-====================================================== -->
 
 <div class="container">
 
     <div id="listArea">
-
         로딩중...
-
     </div>
 
 </div>
 
-
-<br>
-
-
 <script>
 
-
 /* =====================================================
-   지도
-====================================================== */
+   기본 설정
+===================================================== */
 
-let map;
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbwUbacHm34YkWh--zL_e590P6h4S5wQo3iF8tCVZu71ZaTunTwdZ1TMLVqkyuHu-izW/exec";
+
+
+let map = null;
 
 let markers = [];
-
-
-/* =====================================================
-   현재 열려있는 팝업
-====================================================== */
 
 let openedInfoWindow = null;
 
 let openedMarker = null;
 
+let knownIds = new Set();
+
+let alertedOverdueIds = new Set();
+
+let overdueIntervals = new Map();
+
+let firstLoad = true;
+
+let loading = false;
+
+const listArea =
+    document.getElementById("listArea");
+
+const alertSound =
+    document.getElementById("alertSound");
+
 
 /* =====================================================
    지도 초기화
-====================================================== */
+===================================================== */
 
 function initMap(){
 
-    map =
+    try{
 
-        new kakao.maps.Map(
+        map = new kakao.maps.Map(
 
-            document.getElementById(
-                "map"
-            ),
+            document.getElementById("map"),
 
             {
-
                 center:
-
                     new kakao.maps.LatLng(
-
                         35.1345,
-
                         126.9902
-
                     ),
 
                 level:6
-
             }
 
         );
 
-}
+    }
 
+    catch(error){
+
+        console.error(error);
+
+        document.getElementById("map").innerHTML =
+            '<div style="padding:20px;color:#ff9999;">지도 초기화 실패</div>';
+
+    }
+
+}
 
 initMap();
 
 
 /* =====================================================
-   API
-====================================================== */
+   HTML 안전 처리
+===================================================== */
 
-const API_URL =
+function escapeHTML(value){
 
-    "https://script.google.com/macros/s/AKfycbwUbacHm34YkWh--zL_e590P6h4S5wQo3iF8tCVZu71ZaTunTwdZ1TMLVqkyuHu-izW/exec";
+    if(
+        value === null ||
+        value === undefined
+    ){
 
+        return "";
 
-const listArea =
+    }
 
-    document.getElementById(
-        "listArea"
-    );
+    return String(value)
+
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
 
 
 /* =====================================================
-   신규 신고
-====================================================== */
+   날짜 처리
+===================================================== */
 
-let knownIds =
+function parseDate(value){
 
-    new Set();
+    if(
+        !value
+    ){
+
+        return null;
+
+    }
+
+    const date =
+        new Date(value);
+
+    if(
+        Number.isNaN(
+            date.getTime()
+        )
+    ){
+
+        return null;
+
+    }
+
+    return date;
+
+}
 
 
-let alertedOverdueIds =
+/* =====================================================
+   날짜 표시
+===================================================== */
 
-    new Set();
+function formatDate(value){
 
+    const date =
+        parseDate(value);
 
-let overdueIntervals =
+    if(!date){
 
-    new Map();
+        return "";
 
+    }
 
-let firstLoad =
+    return date.toLocaleString(
+        "ko-KR",
+        {
+            year:"numeric",
+            month:"2-digit",
+            day:"2-digit",
+            hour:"2-digit",
+            minute:"2-digit",
+            second:"2-digit"
+        }
+    );
 
-    true;
+}
 
 
 /* =====================================================
    경과시간
-====================================================== */
+===================================================== */
 
 function getElapsedTime(
-
     startTime,
-
     endTime = null
-
 ){
 
     const start =
+        parseDate(startTime);
 
-        new Date(
-            startTime
-        );
+    if(!start){
 
+        return "시간 정보 없음";
+
+    }
 
     const end =
-
         endTime
+        ? parseDate(endTime)
+        : new Date();
 
-        ?
+    if(!end){
 
-        new Date(
-            endTime
-        )
+        return "시간 정보 없음";
 
-        :
-
-        new Date();
-
+    }
 
     const diff =
-
         Math.max(
-
             0,
-
             Math.floor(
-
-                (
-
-                    end - start
-
-                ) / 1000
-
+                (end - start) / 1000
             )
-
         );
-
 
     const h =
-
-        Math.floor(
-            diff / 3600
-        );
-
+        Math.floor(diff / 3600);
 
     const m =
-
         Math.floor(
-
-            (
-
-                diff % 3600
-
-            ) / 60
-
+            (diff % 3600) / 60
         );
 
-
     const s =
-
         diff % 60;
-
 
     if(h > 0){
 
@@ -559,51 +478,32 @@ function getElapsedTime(
 
     }
 
-
     return `${m}분 ${s}초 경과`;
 
 }
 
 
 /* =====================================================
-   상태별 마커 색상
-====================================================== */
+   상태 색상
+===================================================== */
 
-function getMarkerColor(
-
-    status
-
-){
-
-    /* 사고처리 완료 */
+function getMarkerColor(status){
 
     if(
-
-        status ===
-        "사고처리완료"
-
+        status === "사고처리완료"
     ){
 
         return "#777777";
 
     }
 
-
-    /* 현장도착 */
-
     if(
-
-        status ===
-        "현장도착"
-
+        status === "현장도착"
     ){
 
         return "#fb8c00";
 
     }
-
-
-    /* 사고 접수 */
 
     return "#e53935";
 
@@ -611,98 +511,59 @@ function getMarkerColor(
 
 
 /* =====================================================
-   원형 마커
-====================================================== */
+   마커 이미지
+===================================================== */
 
-function createMarkerImage(
-
-    status
-
-){
+function createMarkerImage(status){
 
     const color =
-
-        getMarkerColor(
-            status
-        );
-
+        getMarkerColor(status);
 
     const svg = `
 
         <svg
-
             xmlns="http://www.w3.org/2000/svg"
-
             width="44"
-
             height="44"
-
             viewBox="0 0 44 44"
-
         >
 
             <circle
-
                 cx="22"
-
                 cy="22"
-
                 r="19"
-
                 fill="${color}"
-
                 stroke="#ffffff"
-
                 stroke-width="3"
-
             />
 
-
             <circle
-
                 cx="22"
-
                 cy="22"
-
                 r="7"
-
                 fill="#ffffff"
-
             />
 
         </svg>
 
     `;
 
-
     return new kakao.maps.MarkerImage(
 
         "data:image/svg+xml;charset=utf-8," +
-
-        encodeURIComponent(
-            svg
-        ),
+        encodeURIComponent(svg),
 
         new kakao.maps.Size(
-
             44,
-
             44
-
         ),
 
         {
-
             offset:
-
                 new kakao.maps.Point(
-
                     22,
-
                     22
-
                 )
-
         }
 
     );
@@ -711,331 +572,206 @@ function createMarkerImage(
 
 
 /* =====================================================
-   지도 팝업 내용
-====================================================== */
+   팝업
+===================================================== */
 
 function createInfoWindow(
-
     item,
-
     lat,
-
     lng
-
 ){
 
     let statusColor =
-
         "#e53935";
 
-
     let statusText =
-
         "🔴 사고 접수";
 
-
     if(
-
-        item.status ===
-        "현장도착"
-
+        item.status === "현장도착"
     ){
 
         statusColor =
-
             "#fb8c00";
 
-
         statusText =
-
             "🟠 현장도착";
 
     }
 
-
     if(
-
-        item.status ===
-        "사고처리완료"
-
+        item.status === "사고처리완료"
     ){
 
         statusColor =
-
-            "#777777";
-
+            "#777";
 
         statusText =
-
             "⚪ 사고처리완료";
 
     }
 
+    const safeType =
+        escapeHTML(
+            item.type || "미입력"
+        );
+
+    const safeSymptom =
+        escapeHTML(
+            item.symptom || "내용없음"
+        );
+
+    const safeAddress =
+        escapeHTML(
+            item.address || "주소없음"
+        );
+
+    const safePhone =
+        escapeHTML(
+            item.phone || "번호없음"
+        );
 
     const infoContent = `
 
         <div
-
             style="
-
                 padding:12px;
-
                 color:#222;
-
                 font-family:Arial,sans-serif;
-
                 font-size:13px;
-
                 min-width:250px;
-
-                max-width:300px;
-
+                max-width:310px;
                 line-height:1.5;
-
             "
-
         >
 
-
             <div
-
                 style="
-
                     font-size:16px;
-
                     font-weight:bold;
-
                     margin-bottom:8px;
-
                 "
-
             >
-
                 🆘 산악사고 신고
-
             </div>
-
 
             <div
-
                 style="
-
                     display:inline-block;
-
                     padding:5px 10px;
-
                     background:${statusColor};
-
                     color:#fff;
-
                     border-radius:5px;
-
                     font-weight:bold;
-
                     margin-bottom:8px;
-
                 "
-
             >
-
                 ${statusText}
-
             </div>
-
 
             <br>
 
-
             🚨 <b>신고유형</b><br>
-
-            ${item.type || "미입력"}
-
+            ${safeType}
 
             <br><br>
-
 
             🕒 <b>접수시간</b><br>
-
-            ${
-
-                item.time
-
-                ?
-
-                new Date(
-                    item.time
-                ).toLocaleString()
-
-                :
-
-                ""
-
-            }
-
+            ${formatDate(item.time)}
 
             <br><br>
-
 
             ⏱ <b>경과시간</b><br>
-
-            ${
-
-                getElapsedTime(
-
-                    item.time,
-
-                    item.finishTime
-
-                )
-
-            }
-
+            ${getElapsedTime(
+                item.time,
+                item.finishTime
+            )}
 
             <br><br>
-
 
             📝 <b>상황</b><br>
 
-            ${item.symptom || "내용없음"}
+            <div
+                style="
+                    margin-top:5px;
+                    padding:7px;
+                    background:#f3f3f3;
+                    border-radius:4px;
+                    white-space:pre-wrap;
+                    word-break:break-word;
+                "
+            >
+                ${safeSymptom}
+            </div>
 
-
-            <br><br>
-
+            <br>
 
             🏠 <b>주소</b><br>
-
-            ${item.address || "주소없음"}
-
+            ${safeAddress}
 
             <br><br>
-
 
             📞 <b>연락처</b><br>
-
-            ${item.phone || "번호없음"}
-
+            ${safePhone}
 
             <br><br>
 
-
             📍 <b>좌표</b><br>
-
             ${lat.toFixed(6)},
-
             ${lng.toFixed(6)}
 
-
             ${
-
                 item.completeTime
-
                 ?
-
                 `
-
-                    <br><br>
-
-                    🚑 <b>현장도착</b><br>
-
-                    ${
-
-                        new Date(
-
-                            item.completeTime
-
-                        ).toLocaleString()
-
-                    }
-
+                <br><br>
+                🚑 <b>현장도착</b><br>
+                ${formatDate(item.completeTime)}
                 `
-
                 :
-
                 ""
-
             }
-
 
             ${
-
                 item.finishTime
-
                 ?
-
                 `
-
-                    <br><br>
-
-                    ⚪ <b>사고처리 완료</b><br>
-
-                    ${
-
-                        new Date(
-
-                            item.finishTime
-
-                        ).toLocaleString()
-
-                    }
-
+                <br><br>
+                ⚪ <b>사고처리 완료</b><br>
+                ${formatDate(item.finishTime)}
                 `
-
                 :
-
                 ""
-
             }
-
 
             <div
-
-                style="
-
-                    margin-top:12px;
-
-                "
-
+                style="margin-top:12px;"
             >
 
                 <a
-
                     href="https://map.kakao.com/link/map/구조요청 위치,${lat},${lng}"
-
                     target="_blank"
-
                     style="
-
                         color:#1976d2;
-
                         text-decoration:none;
-
                         font-weight:bold;
-
                     "
-
                 >
-
                     📍 카카오맵에서 보기
-
                 </a>
 
             </div>
-
 
         </div>
 
     `;
 
-
     return new kakao.maps.InfoWindow({
 
         content:
-
             infoContent,
 
-        removable:
-
-            true
+        removable:true
 
     });
 
@@ -1043,162 +779,153 @@ function createInfoWindow(
 
 
 /* =====================================================
+   경보 중지
+===================================================== */
+
+function stopOverdueAlert(id){
+
+    if(
+        overdueIntervals.has(id)
+    ){
+
+        clearInterval(
+            overdueIntervals.get(id)
+        );
+
+        overdueIntervals.delete(id);
+
+    }
+
+}
+
+
+/* =====================================================
    3분 초과 응급환자
-====================================================== */
+===================================================== */
 
 function checkOverdue(
-
     item,
-
     div
-
 ){
 
     if(
-
-        item.type !==
-        "응급환자"
-
+        item.type !== "응급환자"
     ){
 
         return;
 
     }
-
 
     if(
-
-        !item.status ||
-
-        item.status ===
-        "사고처리완료"
-
+        item.status === "사고처리완료"
     ){
+
+        stopOverdueAlert(item.id);
 
         return;
 
     }
 
+    const start =
+        parseDate(item.time);
+
+    if(!start){
+
+        return;
+
+    }
 
     const diffSeconds =
-
         Math.floor(
-
-            (
-
-                new Date() -
-
-                new Date(
-                    item.time
-                )
-
-            ) / 1000
-
+            (new Date() - start) / 1000
         );
-
 
     if(
-
-        diffSeconds >= 180
-
+        diffSeconds < 180
     ){
 
-        div.classList.add(
-            "blink"
+        return;
+
+    }
+
+    div.classList.add("blink");
+
+    if(
+        alertedOverdueIds.has(item.id)
+    ){
+
+        return;
+
+    }
+
+    alertedOverdueIds.add(item.id);
+
+    playAlert();
+
+    const interval =
+        setInterval(
+
+            () => {
+
+                if(
+                    div.classList.contains("done")
+                ){
+
+                    stopOverdueAlert(
+                        item.id
+                    );
+
+                    return;
+
+                }
+
+                playAlert();
+
+            },
+
+            30000
+
         );
 
+    overdueIntervals.set(
+        item.id,
+        interval
+    );
+
+}
+
+
+/* =====================================================
+   알림음
+===================================================== */
+
+function playAlert(){
+
+    try{
+
+        alertSound.currentTime = 0;
+
+        const promise =
+            alertSound.play();
 
         if(
-
-            alertedOverdueIds.has(
-                item.id
-            )
-
+            promise &&
+            promise.catch
         ){
 
-            return;
+            promise.catch(
+                () => {}
+            );
 
         }
 
+    }
 
-        alertedOverdueIds.add(
-            item.id
-        );
+    catch(error){
 
-
-        const interval =
-
-            setInterval(
-
-                () => {
-
-                    if(
-
-                        div.classList.contains(
-                            "done"
-                        )
-
-                    ){
-
-                        clearInterval(
-                            interval
-                        );
-
-                        overdueIntervals.delete(
-                            item.id
-                        );
-
-                        return;
-
-                    }
-
-
-                    const alertSound =
-
-                        document.getElementById(
-                            "alertSound"
-                        );
-
-
-                    alertSound.currentTime =
-                        0;
-
-
-                    alertSound.play()
-                    .catch(
-                        () => {}
-                    );
-
-                },
-
-                30000
-
-            );
-
-
-        overdueIntervals.set(
-
-            item.id,
-
-            interval
-
-        );
-
-
-        const alertSound =
-
-            document.getElementById(
-                "alertSound"
-            );
-
-
-        alertSound.currentTime =
-            0;
-
-
-        alertSound.play()
-        .catch(
-            () => {}
+        console.log(
+            "알림음 재생 제한:",
+            error
         );
 
     }
@@ -1208,165 +935,113 @@ function checkOverdue(
 
 /* =====================================================
    현장도착
-====================================================== */
+===================================================== */
 
-async function completeCase(
-
-    id
-
-){
+async function completeCase(id){
 
     if(
-
         !confirm(
-
             "구조대원이 현장에 도착했습니까?"
-
         )
-
     ){
 
         return;
 
     }
 
-
-    try{
-
-        await fetch(
-
-            API_URL,
-
-            {
-
-                method:
-                    "POST",
-
-                headers:{
-
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-
-                },
-
-                body:
-
-                    JSON.stringify({
-
-                        action:
-                            "complete",
-
-                        id:
-                            id,
-
-                        completeTime:
-
-                            new Date()
-                            .toISOString()
-
-                    })
-
-            }
-
-        );
-
-
-        loadData();
-
-    }
-
-    catch(err){
-
-        console.error(
-            err
-        );
-
-        alert(
-            "현장도착 처리 중 오류가 발생했습니다."
-        );
-
-    }
+    await updateCase(
+        "complete",
+        id
+    );
 
 }
 
 
 /* =====================================================
    사고처리 완료
-====================================================== */
+===================================================== */
 
-async function finishCase(
-
-    id
-
-){
+async function finishCase(id){
 
     if(
-
         !confirm(
-
             "사고처리를 완료하시겠습니까?"
-
         )
-
     ){
 
         return;
 
     }
 
+    await updateCase(
+        "finish",
+        id
+    );
+
+}
+
+
+/* =====================================================
+   상태 변경 공통
+===================================================== */
+
+async function updateCase(
+    action,
+    id
+){
 
     try{
 
-        await fetch(
+        const response =
+            await fetch(
 
-            API_URL,
+                API_URL,
 
-            {
+                {
 
-                method:
-                    "POST",
+                    method:"POST",
 
-                headers:{
+                    headers:{
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
 
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
+                    body:
+                        JSON.stringify({
+                            action:action,
+                            id:String(id)
+                        })
 
-                },
+                }
 
-                body:
+            );
 
-                    JSON.stringify({
+        const result =
+            await response.json();
 
-                        action:
-                            "finish",
+        if(
+            result.result !== "success"
+        ){
 
-                        id:
-                            id,
+            alert(
+                result.message ||
+                "처리 실패"
+            );
 
-                        finishTime:
+            return;
 
-                            new Date()
-                            .toISOString()
+        }
 
-                    })
-
-            }
-
-        );
-
-
-        loadData();
+        await loadData();
 
     }
 
-    catch(err){
+    catch(error){
 
-        console.error(
-            err
-        );
+        console.error(error);
 
         alert(
-            "사고처리 완료 중 오류가 발생했습니다."
+            "서버와 통신하는 중 오류가 발생했습니다."
         );
 
     }
@@ -1375,884 +1050,626 @@ async function finishCase(
 
 
 /* =====================================================
-   신고 목록 불러오기
-====================================================== */
+   마커 삭제
+===================================================== */
+
+function clearMarkers(){
+
+    markers.forEach(
+        marker => {
+            marker.setMap(null);
+        }
+    );
+
+    markers = [];
+
+    if(
+        openedInfoWindow
+    ){
+
+        openedInfoWindow.close();
+
+    }
+
+    openedInfoWindow = null;
+
+    openedMarker = null;
+
+}
+
+
+/* =====================================================
+   신고 목록
+===================================================== */
 
 async function loadData(){
 
+    if(loading){
+
+        return;
+
+    }
+
+    loading = true;
+
     try{
 
-        const res =
-
+        const response =
             await fetch(
-
                 API_URL +
-                "?action=list"
-
+                "?action=list&_=" +
+                Date.now(),
+                {
+                    cache:"no-store"
+                }
             );
 
-
-        const data =
-
-            await res.json();
-
-
-        listArea.innerHTML =
-            "";
-
-
-        /* =================================================
-           기존 마커 제거
-        ================================================== */
-
-        markers.forEach(
-
-            marker => {
-
-                marker.setMap(
-                    null
-                );
-
-            }
-
-        );
-
-
-        markers = [];
-
-
-        /* =================================================
-           기존에 열린 팝업 닫기
-        ================================================== */
-
         if(
-
-            openedInfoWindow
-
+            !response.ok
         ){
 
-            openedInfoWindow.close();
-
-            openedInfoWindow = null;
-
-            openedMarker = null;
+            throw new Error(
+                "HTTP " +
+                response.status
+            );
 
         }
 
-
-        /* =================================================
-           신고 없음
-        ================================================== */
+        const data =
+            await response.json();
 
         if(
+            !Array.isArray(data)
+        ){
 
-            !data.length
+            throw new Error(
+                "서버 응답이 배열이 아닙니다."
+            );
 
+        }
+
+        clearMarkers();
+
+        listArea.innerHTML = "";
+
+        if(
+            data.length === 0
         ){
 
             listArea.innerHTML =
+                `
+                <div class="empty">
+                    현재 접수된 신고가 없습니다.
+                </div>
+                `;
 
-                "현재 접수된 신고가 없습니다.";
+            firstLoad = false;
 
             return;
 
         }
 
 
-        /* =================================================
+        /* =============================================
            신규 신고 확인
-        ================================================== */
+        ============================================= */
 
-        if(
-
-            firstLoad
-
-        ){
+        if(firstLoad){
 
             data.forEach(
-
                 item => {
 
-                    knownIds.add(
-                        item.id
-                    );
+                    if(item.id){
+                        knownIds.add(
+                            String(item.id)
+                        );
+                    }
 
                 }
-
             );
 
-
-            firstLoad =
-
-                false;
+            firstLoad = false;
 
         }
 
         else{
 
-            data.forEach(
+            let newReport = false;
 
+            data.forEach(
                 item => {
 
+                    const id =
+                        String(item.id || "");
+
                     if(
-
-                        !knownIds.has(
-                            item.id
-                        )
-
+                        id &&
+                        !knownIds.has(id)
                     ){
 
-                        knownIds.add(
-                            item.id
-                        );
+                        knownIds.add(id);
 
-
-                        alert(
-                            "🚨 새로운 신고 접수!"
-                        );
-
-
-                        const alertSound =
-
-                            document.getElementById(
-                                "alertSound"
-                            );
-
-
-                        alertSound.currentTime =
-                            0;
-
-
-                        alertSound.play()
-                        .catch(
-                            () => {}
-                        );
+                        newReport = true;
 
                     }
 
                 }
-
             );
+
+            if(newReport){
+
+                alert(
+                    "🚨 새로운 산악사고 신고가 접수되었습니다!"
+                );
+
+                playAlert();
+
+            }
 
         }
 
 
-        /* =================================================
+        /* =============================================
            최신 신고순
-        ================================================== */
+        ============================================= */
 
         data.sort(
 
-            (a,b) =>
+            (a,b) => {
 
-                new Date(
-                    b.time
-                ) -
+                const da =
+                    parseDate(a.time);
 
-                new Date(
-                    a.time
-                )
+                const db =
+                    parseDate(b.time);
 
-        );
+                if(!da) return 1;
 
+                if(!db) return -1;
 
-        /* =================================================
-           신고 처리
-        ================================================== */
-
-        data.forEach(
-
-            item => {
-
-
-                /* =========================================
-                   카드 생성
-                ========================================= */
-
-                const div =
-
-                    document.createElement(
-                        "div"
-                    );
-
-
-                div.className =
-
-                    "card" +
-
-                    (
-
-                        item.status ===
-                        "사고처리완료"
-
-                        ?
-
-                        " done"
-
-                        :
-
-                        ""
-
-                    );
-
-
-                div.setAttribute(
-
-                    "data-time",
-
-                    item.time
-
-                );
-
-
-                if(
-
-                    item.finishTime
-
-                ){
-
-                    div.setAttribute(
-
-                        "data-finish-time",
-
-                        item.finishTime
-
-                    );
-
-                }
-
-
-                /* =========================================
-                   상태
-                ========================================= */
-
-                let statusHTML = "";
-
-
-                if(
-
-                    item.status ===
-                    "사고처리완료"
-
-                ){
-
-                    statusHTML = `
-
-                        <div class="status done">
-
-                            ⚪ 사고처리완료
-
-                        </div>
-
-                    `;
-
-                }
-
-                else if(
-
-                    item.status ===
-                    "현장도착"
-
-                ){
-
-                    statusHTML = `
-
-                        <div class="status arrived">
-
-                            🟠 현장도착
-
-                        </div>
-
-                    `;
-
-                }
-
-                else{
-
-                    statusHTML = `
-
-                        <div class="status received">
-
-                            🔴 사고 접수
-
-                        </div>
-
-                    `;
-
-                }
-
-
-                /* =========================================
-                   현장도착
-                ========================================= */
-
-                let completeHTML = "";
-
-
-                if(
-
-                    item.completeTime
-
-                ){
-
-                    completeHTML = `
-
-                        <div class="time">
-
-                            🚑 현장도착:
-
-                            ${
-
-                                new Date(
-
-                                    item.completeTime
-
-                                ).toLocaleString()
-
-                            }
-
-                        </div>
-
-                    `;
-
-                }
-
-
-                /* =========================================
-                   사고처리 완료
-                ========================================= */
-
-                let finishHTML = "";
-
-
-                if(
-
-                    item.finishTime
-
-                ){
-
-                    finishHTML = `
-
-                        <div class="time">
-
-                            ✅ 사고처리 완료:
-
-                            ${
-
-                                new Date(
-
-                                    item.finishTime
-
-                                ).toLocaleString()
-
-                            }
-
-                        </div>
-
-                    `;
-
-                }
-
-
-                /* =========================================
-                   버튼
-                ========================================= */
-
-                let buttonHTML = "";
-
-
-                if(
-
-                    item.status ===
-                    "사고처리완료"
-
-                ){
-
-                    buttonHTML = `
-
-                        <span
-
-                            style="
-
-                                display:inline-block;
-
-                                margin-top:8px;
-
-                                color:#aaa;
-
-                                font-weight:bold;
-
-                            "
-
-                        >
-
-                            ✔ 처리완료
-
-                        </span>
-
-                    `;
-
-                }
-
-                else if(
-
-                    item.status ===
-                    "현장도착"
-
-                ){
-
-                    buttonHTML = `
-
-                        <button
-
-                            class="complete-btn"
-
-                            onclick="
-
-                                finishCase('${item.id}')
-
-                            "
-
-                        >
-
-                            ✅ 사고처리 완료
-
-                        </button>
-
-                    `;
-
-                }
-
-                else{
-
-                    buttonHTML = `
-
-                        <button
-
-                            class="complete-btn"
-
-                            onclick="
-
-                                completeCase('${item.id}')
-
-                            "
-
-                        >
-
-                            🚑 구조대원 현장도착
-
-                        </button>
-
-                    `;
-
-                }
-
-
-                /* =========================================
-                   카드 내용
-                ========================================= */
-
-                div.innerHTML = `
-
-                    <div class="time">
-
-                        🕒 접수:
-
-                        ${
-
-                            item.time
-
-                            ?
-
-                            new Date(
-
-                                item.time
-
-                            ).toLocaleString()
-
-                            :
-
-                            ""
-
-                        }
-
-                    </div>
-
-
-                    <div class="time elapsed">
-
-                        ⏱
-
-                        ${
-
-                            getElapsedTime(
-
-                                item.time,
-
-                                item.finishTime
-
-                            )
-
-                        }
-
-                    </div>
-
-
-                    ${statusHTML}
-
-
-                    ${completeHTML}
-
-
-                    ${finishHTML}
-
-
-                    <div
-
-                        style="
-
-                            margin-top:5px;
-
-                            font-size:15px;
-
-                            font-weight:bold;
-
-                            color:#ff5252;
-
-                        "
-
-                    >
-
-                        🚨
-
-                        ${
-
-                            item.type ||
-
-                            "미입력"
-
-                        }
-
-                    </div>
-
-
-                    <br>
-
-
-                    🏠
-
-                    ${
-
-                        item.address ||
-
-                        "주소없음"
-
-                    }
-
-
-                    <br><br>
-
-
-                    📞
-
-                    ${
-
-                        item.phone ||
-
-                        "번호없음"
-
-                    }
-
-
-                    <br><br>
-
-
-                    📝
-
-                    ${
-
-                        item.symptom ||
-
-                        "내용없음"
-
-                    }
-
-
-                    <div class="coord">
-
-                        위도:
-
-                        ${item.lat}
-
-                        /
-
-                        경도:
-
-                        ${item.lng}
-
-                    </div>
-
-
-                    <a
-
-                        class="maplink"
-
-                        href="https://map.kakao.com/link/map/구조요청 위치,${item.lat},${item.lng}"
-
-                        target="_blank"
-
-                    >
-
-                        📍 지도보기
-
-                    </a>
-
-
-                    <br>
-
-
-                    ${buttonHTML}
-
-                `;
-
-
-                listArea.appendChild(
-                    div
-                );
-
-
-                /* =========================================
-                   3분 초과 체크
-                ========================================= */
-
-                checkOverdue(
-
-                    item,
-
-                    div
-
-                );
-
-
-                /* =========================================
-                   지도 마커
-                ========================================= */
-
-                if(
-
-                    item.lat &&
-                    item.lng
-
-                ){
-
-                    const lat =
-
-                        Number(
-                            item.lat
-                        );
-
-
-                    const lng =
-
-                        Number(
-                            item.lng
-                        );
-
-
-                    if(
-
-                        Number.isFinite(lat) &&
-
-                        Number.isFinite(lng)
-
-                    ){
-
-                        const position =
-
-                            new kakao.maps.LatLng(
-
-                                lat,
-
-                                lng
-
-                            );
-
-
-                        /* 원형 마커 */
-
-                        const markerImage =
-
-                            createMarkerImage(
-
-                                item.status
-
-                            );
-
-
-                        const marker =
-
-                            new kakao.maps.Marker({
-
-                                map:
-                                    map,
-
-                                position:
-                                    position,
-
-                                title:
-
-                                    item.type ||
-
-                                    "산악사고 신고",
-
-                                image:
-
-                                    markerImage
-
-                            });
-
-
-                        markers.push(
-                            marker
-                        );
-
-
-                        /* =================================
-                           팝업 생성
-                        ================================= */
-
-                        const infoWindow =
-
-                            createInfoWindow(
-
-                                item,
-
-                                lat,
-
-                                lng
-
-                            );
-
-
-                        /* =================================
-                           핀 클릭 토글
-                           
-                           1번 클릭 → 열기
-                           2번 클릭 → 닫기
-                           다른 핀 → 기존 닫고 새로 열기
-                        ================================= */
-
-                        kakao.maps.event.addListener(
-
-                            marker,
-
-                            "click",
-
-                            function(){
-
-                                /* 같은 핀을 다시 클릭 */
-
-                                if(
-
-                                    openedMarker ===
-                                    marker
-
-                                ){
-
-                                    if(
-                                        openedInfoWindow
-                                    ){
-
-                                        openedInfoWindow.close();
-
-                                    }
-
-
-                                    openedInfoWindow =
-                                        null;
-
-                                    openedMarker =
-                                        null;
-
-                                    return;
-
-                                }
-
-
-                                /* 다른 핀의 팝업 닫기 */
-
-                                if(
-
-                                    openedInfoWindow
-
-                                ){
-
-                                    openedInfoWindow.close();
-
-                                }
-
-
-                                /* 새 팝업 열기 */
-
-                                infoWindow.open(
-
-                                    map,
-
-                                    marker
-
-                                );
-
-
-                                /* 현재 팝업 저장 */
-
-                                openedInfoWindow =
-                                    infoWindow;
-
-                                openedMarker =
-                                    marker;
-
-                            }
-
-                        );
-
-                    }
-
-                }
+                return db - da;
 
             }
 
         );
 
 
-        /* =================================================
-           모든 마커가 지도에 보이도록 범위 설정
-        ================================================== */
+        /* =============================================
+           카드
+        ============================================= */
 
-        if(
+        data.forEach(
+            item => {
 
-            markers.length > 0
+                const id =
+                    String(item.id || "");
 
-        ){
+                const div =
+                    document.createElement("div");
 
-            const bounds =
+                div.className =
+                    "card";
 
-                new kakao.maps.LatLngBounds();
+                if(
+                    item.status ===
+                    "사고처리완료"
+                ){
+
+                    div.classList.add("done");
+
+                }
+
+                div.dataset.time =
+                    item.time || "";
+
+                div.dataset.finishTime =
+                    item.finishTime || "";
 
 
-            markers.forEach(
+                /* =====================================
+                   상태
+                ===================================== */
 
-                marker => {
+                let statusHTML = "";
 
-                    bounds.extend(
+                if(
+                    item.status ===
+                    "사고처리완료"
+                ){
 
-                        marker.getPosition()
+                    statusHTML = `
+                        <div class="status done">
+                            ⚪ 사고처리완료
+                        </div>
+                    `;
+
+                }
+
+                else if(
+                    item.status ===
+                    "현장도착"
+                ){
+
+                    statusHTML = `
+                        <div class="status arrived">
+                            🟠 현장도착
+                        </div>
+                    `;
+
+                }
+
+                else{
+
+                    statusHTML = `
+                        <div class="status received">
+                            🔴 사고 접수
+                        </div>
+                    `;
+
+                }
+
+
+                /* =====================================
+                   현장도착 시간
+                ===================================== */
+
+                let completeHTML = "";
+
+                if(
+                    item.completeTime
+                ){
+
+                    completeHTML = `
+                        <div class="time">
+                            🚑 현장도착:
+                            ${escapeHTML(
+                                formatDate(
+                                    item.completeTime
+                                )
+                            )}
+                        </div>
+                    `;
+
+                }
+
+
+                /* =====================================
+                   완료 시간
+                ===================================== */
+
+                let finishHTML = "";
+
+                if(
+                    item.finishTime
+                ){
+
+                    finishHTML = `
+                        <div class="time">
+                            ✅ 사고처리 완료:
+                            ${escapeHTML(
+                                formatDate(
+                                    item.finishTime
+                                )
+                            )}
+                        </div>
+                    `;
+
+                }
+
+
+                /* =====================================
+                   버튼
+                ===================================== */
+
+                let buttonHTML = "";
+
+                if(
+                    item.status ===
+                    "사고처리완료"
+                ){
+
+                    buttonHTML = `
+                        <span style="
+                            display:inline-block;
+                            margin-top:10px;
+                            color:#aaa;
+                            font-weight:bold;
+                        ">
+                            ✔ 처리완료
+                        </span>
+                    `;
+
+                    stopOverdueAlert(id);
+
+                }
+
+                else if(
+                    item.status ===
+                    "현장도착"
+                ){
+
+                    buttonHTML = `
+                        <button
+                            class="complete-btn finish"
+                            onclick="finishCase('${escapeHTML(id)}')"
+                        >
+                            ✅ 사고처리 완료
+                        </button>
+                    `;
+
+                }
+
+                else{
+
+                    buttonHTML = `
+                        <button
+                            class="complete-btn"
+                            onclick="completeCase('${escapeHTML(id)}')"
+                        >
+                            🚑 구조대원 현장도착
+                        </button>
+                    `;
+
+                }
+
+
+                /* =====================================
+                   카드 내용
+                ===================================== */
+
+                div.innerHTML = `
+
+                    <div class="time">
+
+                        🕒 접수:
+                        ${escapeHTML(
+                            formatDate(item.time)
+                        )}
+
+                    </div>
+
+                    <div class="time elapsed">
+
+                        ⏱
+                        ${escapeHTML(
+                            getElapsedTime(
+                                item.time,
+                                item.finishTime
+                            )
+                        )}
+
+                    </div>
+
+                    ${statusHTML}
+
+                    ${completeHTML}
+
+                    ${finishHTML}
+
+                    <div class="type">
+
+                        🚨
+                        ${escapeHTML(
+                            item.type || "미입력"
+                        )}
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        🏠 <b>주소</b>
+
+                        <div style="margin-top:4px;">
+                            ${escapeHTML(
+                                item.address || "주소없음"
+                            )}
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        📞 <b>연락처</b>
+
+                        <div style="margin-top:4px;">
+                            ${escapeHTML(
+                                item.phone || "번호없음"
+                            )}
+                        </div>
+
+                    </div>
+
+
+                    <div class="info-box">
+
+                        📝 <b>신고 내용</b>
+
+                        <div class="symptom">
+
+                            ${escapeHTML(
+                                item.symptom || "내용없음"
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="coord">
+
+                        위도:
+                        ${escapeHTML(item.lat)}
+
+                        /
+
+                        경도:
+                        ${escapeHTML(item.lng)}
+
+                    </div>
+
+
+                    <a
+                        class="maplink"
+                        href="https://map.kakao.com/link/map/구조요청 위치,${item.lat},${item.lng}"
+                        target="_blank"
+                    >
+                        📍 지도보기
+                    </a>
+
+                    <br>
+
+                    ${buttonHTML}
+
+                `;
+
+
+                listArea.appendChild(div);
+
+
+                /* =====================================
+                   3분 초과 확인
+                ===================================== */
+
+                checkOverdue(
+                    item,
+                    div
+                );
+
+
+                /* =====================================
+                   지도 마커
+                ===================================== */
+
+                const lat =
+                    Number(item.lat);
+
+                const lng =
+                    Number(item.lng);
+
+                if(
+                    map &&
+                    Number.isFinite(lat) &&
+                    Number.isFinite(lng)
+                ){
+
+                    const position =
+                        new kakao.maps.LatLng(
+                            lat,
+                            lng
+                        );
+
+                    const marker =
+                        new kakao.maps.Marker({
+
+                            map:map,
+
+                            position:position,
+
+                            title:
+                                item.type ||
+                                "산악사고 신고",
+
+                            image:
+                                createMarkerImage(
+                                    item.status
+                                )
+
+                        });
+
+                    markers.push(marker);
+
+
+                    const infoWindow =
+                        createInfoWindow(
+                            item,
+                            lat,
+                            lng
+                        );
+
+
+                    kakao.maps.event.addListener(
+
+                        marker,
+
+                        "click",
+
+                        function(){
+
+                            if(
+                                openedMarker ===
+                                marker
+                            ){
+
+                                if(
+                                    openedInfoWindow
+                                ){
+
+                                    openedInfoWindow.close();
+
+                                }
+
+                                openedInfoWindow = null;
+
+                                openedMarker = null;
+
+                                return;
+
+                            }
+
+
+                            if(
+                                openedInfoWindow
+                            ){
+
+                                openedInfoWindow.close();
+
+                            }
+
+
+                            infoWindow.open(
+                                map,
+                                marker
+                            );
+
+                            openedInfoWindow =
+                                infoWindow;
+
+                            openedMarker =
+                                marker;
+
+                        }
 
                     );
 
                 }
 
-            );
+            }
+        );
 
+
+        /* =============================================
+           모든 마커가 보이도록
+        ============================================= */
+
+        if(
+            markers.length > 0 &&
+            map
+        ){
+
+            const bounds =
+                new kakao.maps.LatLngBounds();
+
+            markers.forEach(
+                marker => {
+
+                    bounds.extend(
+                        marker.getPosition()
+                    );
+
+                }
+            );
 
             map.setBounds(
                 bounds
@@ -2262,16 +1679,38 @@ async function loadData(){
 
     }
 
-    catch(err){
+    catch(error){
 
         console.error(
-            err
+            "loadData 오류:",
+            error
         );
 
+        listArea.innerHTML = `
 
-        listArea.innerHTML =
+            <div class="error">
 
-            "구글시트 로딩 실패. 콘솔 확인";
+                ⚠ 신고목록을 불러오지 못했습니다.
+
+                <br><br>
+
+                ${escapeHTML(
+                    error.message
+                )}
+
+                <br><br>
+
+                잠시 후 자동으로 다시 시도합니다.
+
+            </div>
+
+        `;
+
+    }
+
+    finally{
+
+        loading = false;
 
     }
 
@@ -2280,248 +1719,125 @@ async function loadData(){
 
 /* =====================================================
    최초 실행
-====================================================== */
+===================================================== */
 
 loadData();
 
 
 /* =====================================================
-   10초마다 갱신
-====================================================== */
+   10초마다 신고목록 갱신
+===================================================== */
 
 setInterval(
-
     loadData,
-
     10000
-
 );
 
 
 /* =====================================================
-   경과시간 1초마다 갱신
-====================================================== */
+   경과시간 1초 갱신
+===================================================== */
 
 setInterval(
 
     () => {
 
         document
-
-        .querySelectorAll(
-            ".card"
-        )
-
-        .forEach(
-
-            card => {
+            .querySelectorAll(".card")
+            .forEach(card => {
 
                 const elapsedEl =
-
                     card.querySelector(
-                        ".time.elapsed"
+                        ".elapsed"
                     );
 
-
-                const timeAttr =
-
-                    card.getAttribute(
-                        "data-time"
-                    );
-
-
-                const finishTimeAttr =
-
-                    card.getAttribute(
-                        "data-finish-time"
-                    );
-
-
-                if(
-
-                    !elapsedEl ||
-                    !timeAttr
-
-                ){
+                if(!elapsedEl){
 
                     return;
 
                 }
 
+                const startTime =
+                    card.dataset.time;
+
+                const finishTime =
+                    card.dataset.finishTime;
 
                 elapsedEl.innerText =
-
                     "⏱ " +
-
                     getElapsedTime(
-
-                        timeAttr,
-
-                        finishTimeAttr
-
+                        startTime,
+                        finishTime
                     );
 
-            }
-
-        );
+            });
 
     },
 
     1000
-
 );
 
-</script>
-
-
-<script>
 
 /* =====================================================
    우클릭 방지
-====================================================== */
+===================================================== */
 
 document.addEventListener(
-
     "contextmenu",
-
     function(e){
-
         e.preventDefault();
-
-        return false;
-
     }
-
 );
 
 
 /* =====================================================
    개발자도구 단축키 방지
-====================================================== */
+===================================================== */
 
 document.addEventListener(
-
     "keydown",
-
     function(e){
 
-        /* F12 */
+        if(e.key === "F12"){
+
+            e.preventDefault();
+
+        }
 
         if(
-
-            e.key ===
-            "F12"
-
+            e.ctrlKey &&
+            e.key.toLowerCase() === "u"
         ){
 
             e.preventDefault();
 
-            return false;
-
         }
 
-
-        /* Ctrl + U */
-
         if(
-
             e.ctrlKey &&
-
-            e.key.toLowerCase() ===
-            "u"
-
-        ){
-
-            e.preventDefault();
-
-            return false;
-
-        }
-
-
-        /* Ctrl + Shift + I */
-
-        if(
-
-            e.ctrlKey &&
-
             e.shiftKey &&
-
-            e.key.toLowerCase() ===
-            "i"
-
+            ["i","j","c"].includes(
+                e.key.toLowerCase()
+            )
         ){
 
             e.preventDefault();
-
-            return false;
 
         }
 
-
-        /* Ctrl + Shift + J */
-
         if(
-
             e.ctrlKey &&
-
-            e.shiftKey &&
-
-            e.key.toLowerCase() ===
-            "j"
-
+            e.key.toLowerCase() === "s"
         ){
 
             e.preventDefault();
-
-            return false;
-
-        }
-
-
-        /* Ctrl + Shift + C */
-
-        if(
-
-            e.ctrlKey &&
-
-            e.shiftKey &&
-
-            e.key.toLowerCase() ===
-            "c"
-
-        ){
-
-            e.preventDefault();
-
-            return false;
-
-        }
-
-
-        /* Ctrl + S */
-
-        if(
-
-            e.ctrlKey &&
-
-            e.key.toLowerCase() ===
-            "s"
-
-        ){
-
-            e.preventDefault();
-
-            return false;
 
         }
 
     }
-
 );
 
 </script>
-
 
 </body>
 
