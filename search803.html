@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🛰 SEARCH AND RESCUE AI MAP</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw/dist/leaflet.draw.css">
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-draw/dist/leaflet.draw.js"></script>
+
+
+<style>
+
+body{
+    margin:0;
+    background:#050b18;
+    color:#00ff9d;
+    font-family:monospace;
+    overflow:hidden;
+}
+
+
+header{
+    background:#071a2f;
+    padding:10px;
+    text-align:center;
+    font-weight:bold;
+}
+
+
+#container{
+    display:flex;
+    height:calc(100vh - 50px);
+}
+
+
+#panel{
+    width:300px;
+    background:#07101f;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    overflow-y:auto;
+}
+
+
+#map{
+    flex:1;
+}
+
+
+input,button{
+
+    padding:10px;
+    border:1px solid #00ff9d;
+    background:#001a14;
+    color:#00ff9d;
+
+}
+
+
+button:disabled{
+    opacity:0.5;
+}
+
+
+@media(max-width:768px){
+
+#container{
+    flex-direction:column;
+}
+
+#panel{
+    width:100%;
+    max-height:35vh;
+}
+
+#map{
+    height:65vh;
+}
+
+}
+
+
+.name-label{
+
+background:#001a14;
+color:#00ff9d;
+border:1px solid #00ff9d;
+border-radius:5px;
+padding:3px 8px;
+font-size:12px;
+font-weight:bold;
+box-shadow:0 0 8px #00ff9d;
+
+}
+
+.mouse-coords{
+    background:rgba(0,0,0,.8);
+    color:#00ff9d;
+    border:1px solid #00ff9d;
+    border-radius:5px;
+    padding:6px 10px;
+    font-size:12px;
+    font-family:monospace;
+    box-shadow:0 0 8px #00ff9d;
+}    
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+🛰 SEARCH AND RESCUE AI MAP
+</header>
+
+
+
+<div id="container">
+
+
+<div id="panel">
+
+<input id="name" placeholder="RESCUE ID">
+
+
+<button id="startBtn" onclick="start()" disabled>
+START
+</button>
+
+
+<button onclick="goMyLocation()">
+📍 MY LOCATION
+</button>
+
+
+<button onclick="shareLocation()">
+📡 위치 공유
+</button>
+
+
+<button onclick="sendSOS()">
+🚨 SOS
+</button>
+
+
+<button onclick="stopTracking()">
+⛔ STOP
+</button>
+
+
+<button onclick="loadAllHistory()">
+📦 전체 기록
+</button>
+
+
+</div>
+
+
+
+<div id="map"></div>
+
+
+</div>
+
+
+<script>
+    
+// ================= API =================
+
+const API_URL =
+"https://script.google.com/macros/s/AKfycbyem5fAs2XGxNy6wrHO3s68CmJyHy7GI31IBKdiz49KtN3sfikYdfmpP07-3dWqna2R/exec";
+
+
+// ================= DEVICE =================
+
+let DEVICE_ID =
+localStorage.getItem("DEVICE_ID");
+
+
+if(!DEVICE_ID){
+
+    DEVICE_ID =
+    crypto.randomUUID();
+
+    localStorage.setItem(
+        "DEVICE_ID",
+        DEVICE_ID
+    );
+
+}
+
+
+
+// ================= MAP =================
+
+const map =
+L.map("map")
+.setView(
+    [36.016537,128.695323],
+    13
+);
+
+
+
+// ================= TILE =================
+
+const osm =
+L.tileLayer(
+"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+);
+
+
+const topo =
+L.tileLayer(
+"https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+);
+
+
+const satellite =
+L.tileLayer(
+"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+);
+
+
+
+osm.addTo(map);
+
+
+
+L.control.layers({
+
+"🗺 일반지도":osm,
+
+"⛰ 지형지도":topo,
+
+"🛰 위성지도":satellite
+
+
+}).addTo(map);
+
+
+/*
+================================
+MOUSE COORDINATES
+================================
+*/
+
+const coordControl = L.control({
+    position: "bottomleft"
+});
+
+coordControl.onAdd = function () {
+
+    this._div = L.DomUtil.create("div","mouse-coords");
+
+    this._div.innerHTML =
+        "Lat : --<br>Lng : --";
+
+    return this._div;
+};
+
+coordControl.addTo(map);
+
+map.on("mousemove",function(e){
+
+    coordControl._div.innerHTML =
+        "Lat : " + e.latlng.lat.toFixed(6) +
+        "<br>Lng : " + e.latlng.lng.toFixed(6);
+
+});
+
+map.on("mouseout",function(){
+
+    coordControl._div.innerHTML =
+        "Lat : --<br>Lng : --";
+
+});
+
+
+
+// ================= DRAW =================
+
+
+const drawnItems =
+new L.FeatureGroup();
+
+
+map.addLayer(
+drawnItems
+);
+
+
+
+const drawControl =
+new L.Control.Draw({
+
+position:"topright",
+
+draw:{
+
+polygon:true,
+
+rectangle:true,
+
+circle:true,
+
+marker:true,
+
+polyline:true,
+
+circlemarker:false
+
+},
+
+
+edit:{
+
+featureGroup:drawnItems,
+
+remove:true
+
+}
+
+
+});
+
+
+map.addControl(drawControl);
+
+
+
+map.on(
+L.Draw.Event.CREATED,
+function(e){
+
+drawnItems.addLayer(
+e.layer
+);
+
+});
+
+
+
+
+
+
+
+// ================= STATE =================
+
+
+let myName="";
+
+let lastPos=null;
+
+let watchId=null;
+
+
+let intervalSend=null;
+
+let intervalLoad=null;
+
+
+let startTime="";
+
+let endTime="";
+
+
+
+const markers={};
+
+
+
+const rescueColors={};
+
+
+const colors=[
+
+"#00ff9d",
+
+"#00aaff",
+
+"#ffcc00",
+
+"#ff00ff",
+
+"#ff6600",
+
+"#ffffff"
+
+];
+
+
+
+function getColor(name){
+
+
+if(!rescueColors[name]){
+
+
+rescueColors[name]
+=
+colors[
+Object.keys(rescueColors).length
+%
+colors.length
+];
+
+
+}
+
+
+return rescueColors[name];
+
+
+}
+
+
+
+
+
+const historyMarkers =
+L.layerGroup()
+.addTo(map);
+
+
+
+const historyLines =
+L.layerGroup()
+.addTo(map);
+
+
+
+const sosLayer =
+L.layerGroup()
+.addTo(map);
+
+
+
+
+
+
+// ================= INPUT =================
+
+
+const nameInput =
+document.getElementById("name");
+
+
+const startBtn =
+document.getElementById("startBtn");
+
+
+
+nameInput.addEventListener(
+"input",
+()=>{
+
+
+startBtn.disabled =
+nameInput.value.trim().length===0;
+
+
+});
+
+
+
+
+
+
+
+// ================= TIME =================
+
+
+function getNowTime(){
+
+
+const now =
+new Date();
+
+
+
+const y =
+now.getFullYear();
+
+
+
+const m =
+String(
+now.getMonth()+1
+)
+.padStart(2,"0");
+
+
+
+const d =
+String(
+now.getDate()
+)
+.padStart(2,"0");
+
+
+
+const h =
+String(
+now.getHours()
+)
+.padStart(2,"0");
+
+
+
+const min =
+String(
+now.getMinutes()
+)
+.padStart(2,"0");
+
+
+
+const s =
+String(
+now.getSeconds()
+)
+.padStart(2,"0");
+
+
+
+return `${y}-${m}-${d} ${h}:${min}:${s}`;
+
+
+}
+
+
+
+
+
+
+
+// ================= START =================
+
+
+function start(){
+
+
+myName =
+nameInput.value.trim();
+
+
+
+if(!myName){
+
+alert(
+"UNIT ID required"
+);
+
+return;
+
+}
+
+
+
+startTime =
+getNowTime();
+
+
+endTime="";
+
+
+
+nameInput.disabled=true;
+
+startBtn.disabled=true;
+
+
+
+
+watchId =
+navigator.geolocation.watchPosition(
+
+
+(pos)=>{
+
+
+lastPos={
+
+
+name:myName,
+
+
+device:DEVICE_ID,
+
+
+lat:pos.coords.latitude,
+
+
+lng:pos.coords.longitude,
+
+
+status:"normal"
+
+
+};
+
+
+
+},
+
+
+
+(err)=>{
+
+
+console.log(err);
+
+
+alert(
+"GPS 오류 / 권한 확인"
+);
+
+
+},
+
+
+
+{
+
+
+enableHighAccuracy:true,
+
+
+maximumAge:1000
+
+
+}
+
+
+);
+
+
+
+
+
+intervalSend =
+setInterval(
+sendData,
+5000
+);
+
+
+
+intervalLoad =
+setInterval(
+loadLive,
+3000
+);
+
+
+
+}
+
+
+
+
+
+
+
+// ================= SEND LIVE =================
+
+
+function sendData(){
+
+
+if(!lastPos)
+return;
+
+
+
+fetch(
+API_URL,
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"text/plain"
+
+},
+
+
+body:JSON.stringify({
+
+...lastPos,
+
+startTime:startTime,
+
+endTime:endTime
+
+})
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+// ================= LIVE LOAD =================
+
+
+function loadLive(){
+
+
+fetch(
+
+API_URL
++
+"?live=1&t="
++
+Date.now()
+
+)
+
+.then(
+r=>r.json()
+)
+
+.then(
+renderLive
+);
+
+
+}
+
+
+// ================= LIVE RENDER =================
+
+function renderLive(data){
+
+
+    sosLayer.clearLayers();
+
+
+
+    data.forEach(p=>{
+
+
+        const lat =
+        Number(p.lat);
+
+
+        const lng =
+        Number(p.lng);
+
+
+
+        if(
+            !Number.isFinite(lat)
+            ||
+            !Number.isFinite(lng)
+        ){
+
+            return;
+
+        }
+
+
+
+        const key =
+        p.name;
+
+
+
+        const pos =
+        [
+            lat,
+            lng
+        ];
+
+
+
+
+
+        // 처음 표시
+
+        if(!markers[key]){
+
+
+            markers[key] =
+
+            L.circleMarker(
+
+                pos,
+
+                {
+
+                    radius:10,
+
+                    color:getColor(key),
+
+                    fillColor:getColor(key),
+
+                    fillOpacity:1,
+
+                    weight:3
+
+                }
+
+            )
+
+            .addTo(map)
+
+            .bindTooltip(
+
+                p.name,
+
+                {
+
+                    permanent:true,
+
+                    direction:"top",
+
+                    className:"name-label"
+
+                }
+
+            );
+
+
+
+        }
+
+
+        else{
+
+
+            markers[key]
+            .setLatLng(pos);
+
+
+
+        }
+
+
+
+
+
+
+
+        // ================= STATUS =================
+
+
+
+        if(p.status==="SOS"){
+
+
+
+            markers[key]
+            .setStyle({
+
+                color:"red",
+
+                fillColor:"red",
+
+                radius:14
+
+            });
+
+
+
+
+            L.circle(
+
+                pos,
+
+                {
+
+                    radius:50,
+
+                    color:"red",
+
+                    fillColor:"red",
+
+                    fillOpacity:0.3
+
+                }
+
+            )
+
+            .addTo(sosLayer);
+
+
+
+
+
+        }
+
+
+
+
+        else if(p.status==="SHARE"){
+
+
+
+            markers[key]
+            .setStyle({
+
+                color:"#0088ff",
+
+                fillColor:"#0088ff"
+
+            });
+
+
+
+        }
+
+
+
+
+
+        else{
+
+
+            markers[key]
+            .setStyle({
+
+                color:getColor(key),
+
+                fillColor:getColor(key)
+
+            });
+
+
+
+        }
+
+
+
+    });
+
+
+
+}
+
+
+
+
+
+
+
+// ================= CENTER =================
+
+
+function goMyLocation(){
+
+
+    if(!lastPos)
+    return;
+
+
+
+    map.setView(
+
+        [
+
+            lastPos.lat,
+
+            lastPos.lng
+
+        ],
+
+        16
+
+    );
+
+
+}
+
+
+
+
+
+
+
+
+// ================= SOS =================
+
+
+function sendSOS(){
+
+
+
+    if(!lastPos){
+
+
+        alert(
+            "현재 위치가 없습니다."
+        );
+
+
+        return;
+
+
+    }
+
+
+
+
+    fetch(
+
+        API_URL,
+
+        {
+
+        method:"POST",
+
+
+        headers:{
+
+
+            "Content-Type":
+            "text/plain"
+
+
+        },
+
+
+
+        body:JSON.stringify({
+
+
+            ...lastPos,
+
+
+            startTime:startTime,
+
+
+            endTime:endTime,
+
+
+            status:"SOS"
+
+
+        })
+
+
+
+        }
+
+    );
+
+
+
+
+
+    alert(
+        "🚨 SOS 전송 완료"
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+// ================= SHARE LOCATION =================
+
+
+function shareLocation(){
+
+
+
+    if(!lastPos){
+
+
+        alert(
+            "현재 위치가 없습니다."
+        );
+
+
+        return;
+
+
+    }
+
+
+
+
+    const url =
+
+    `https://www.google.com/maps?q=${lastPos.lat},${lastPos.lng}`;
+
+
+
+
+
+
+    const text =
+
+
+`📡 구조대 위치공유
+
+UNIT : ${lastPos.name}
+
+위치 :
+${url}`;
+
+
+
+
+
+
+
+    // 서버 기록
+
+
+    fetch(
+
+        API_URL,
+
+        {
+
+
+        method:"POST",
+
+
+        headers:{
+
+
+            "Content-Type":
+            "text/plain"
+
+
+        },
+
+
+        body:JSON.stringify({
+
+
+            ...lastPos,
+
+
+            status:"SHARE"
+
+
+        })
+
+
+
+        }
+
+    );
+
+
+
+
+
+
+
+    // 휴대폰 공유
+
+
+    if(
+        navigator.share
+    ){
+
+
+
+        navigator.share({
+
+            title:
+            "구조대 위치",
+
+
+            text:text,
+
+
+            url:url
+
+
+        })
+
+        .catch(
+            console.log
+        );
+
+
+
+    }
+
+
+
+    else{
+
+
+
+        location.href =
+
+        "sms:?body="
+
+        +
+
+        encodeURIComponent(text);
+
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+// ================= STOP =================
+
+
+function stopTracking(){
+
+
+    endTime =
+    getNowTime();
+
+
+
+
+    if(lastPos){
+
+
+
+        fetch(
+
+            API_URL,
+
+            {
+
+
+            method:"POST",
+
+
+            headers:{
+
+
+            "Content-Type":
+            "text/plain"
+
+
+            },
+
+
+
+            body:JSON.stringify({
+
+
+                ...lastPos,
+
+
+                startTime:startTime,
+
+
+                endTime:endTime,
+
+
+                status:"STOP"
+
+
+            })
+
+
+
+            }
+
+        );
+
+
+
+    }
+
+
+
+
+
+    if(watchId){
+
+
+
+        navigator.geolocation.clearWatch(
+            watchId
+        );
+
+
+        watchId=null;
+
+
+    }
+
+
+
+
+
+
+    clearInterval(
+        intervalSend
+    );
+
+
+    clearInterval(
+        intervalLoad
+    );
+
+
+
+
+
+    intervalSend=null;
+
+    intervalLoad=null;
+
+
+
+
+
+    lastPos=null;
+
+
+    myName="";
+
+
+    startTime="";
+
+
+    endTime="";
+
+
+
+
+    nameInput.disabled=false;
+
+
+    nameInput.value="";
+
+
+
+    startBtn.disabled=true;
+
+
+
+
+
+    alert(
+        "⛔ STOP 완료"
+    );
+
+
+
+}
+
+ 
+// ================= HISTORY LOAD =================
+
+
+function loadAllHistory(){
+
+
+    fetch(
+
+        API_URL
+        +
+        "?history=1&t="
+        +
+        Date.now()
+
+    )
+
+
+    .then(
+
+        r=>r.json()
+
+    )
+
+
+    .then(
+
+        showHistoryMap
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+// ================= HISTORY MAP =================
+
+
+function showHistoryMap(data){
+
+
+
+    historyMarkers.clearLayers();
+
+    historyLines.clearLayers();
+
+
+
+
+    const grouped={};
+
+
+
+
+
+    // 시간순 정렬
+
+
+    data.sort(
+
+        (a,b)=>
+
+        new Date(a.time)
+
+        -
+
+        new Date(b.time)
+
+    );
+
+
+
+
+
+
+    // 구조대별 그룹
+
+
+    data.forEach(d=>{
+
+
+
+        if(!grouped[d.name]){
+
+
+            grouped[d.name]=[];
+
+
+        }
+
+
+
+
+        grouped[d.name].push([
+
+
+            Number(d.lat),
+
+
+            Number(d.lng)
+
+
+
+        ]);
+
+
+
+
+    });
+
+
+
+
+
+
+    const allPoints=[];
+
+
+
+
+
+
+
+    for(const name in grouped){
+
+
+
+        const path =
+
+        grouped[name];
+
+
+
+
+        if(path.length===0)
+
+        continue;
+
+
+
+
+
+
+        allPoints.push(
+            ...path
+        );
+
+
+
+
+
+
+        // 시작 위치
+
+
+        L.marker(
+
+            path[0]
+
+        )
+
+        .bindPopup(
+
+            "🟢 START : "
+
+            +
+
+            name
+
+        )
+
+        .addTo(
+            historyMarkers
+        );
+
+
+
+
+
+
+
+        // 종료 위치
+
+
+        L.marker(
+
+            path[path.length-1]
+
+        )
+
+        .bindPopup(
+
+            "🔴 END : "
+
+            +
+
+            name
+
+        )
+
+        .addTo(
+            historyMarkers
+        );
+
+
+
+
+
+
+
+
+
+        // 이동 경로
+
+
+        L.polyline(
+
+            path,
+
+            {
+
+
+            color:
+            getColor(name),
+
+
+            weight:5,
+
+
+            opacity:0.8
+
+
+
+            }
+
+        )
+
+        .addTo(
+            historyLines
+        );
+
+
+
+
+
+    }
+
+
+
+
+
+
+    // 전체 경로 자동 확대
+
+
+    if(allPoints.length){
+
+
+
+        map.fitBounds(
+
+            allPoints,
+
+            {
+
+            padding:[50,50]
+
+            }
+
+        );
+
+
+
+    }
+
+
+
+
+
+}
+
+
+
+
+
+
+
+// ================= INITIAL =================
+
+
+// 페이지 시작 시 LIVE 한번 실행
+    
+loadLive();
+
+</script>
+
+<script>
+/* =========================
+   우클릭 및 개발자도구 단축키 방지
+   ========================= */
+
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    return false;
+});
+
+document.addEventListener('keydown', function(e) {
+
+    // F12
+    if (e.key === 'F12') {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl + U (페이지 소스 보기)
+    if (e.ctrlKey && e.key.toLowerCase() === 'u') {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl + Shift + I (개발자 도구)
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl + Shift + J (콘솔)
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl + Shift + C (요소 선택)
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'c') {
+        e.preventDefault();
+        return false;
+    }
+
+    // Ctrl + S (페이지 저장)
+    if (e.ctrlKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        return false;
+    }
+});
+</script>
+
+    
+</body>
+</html>
