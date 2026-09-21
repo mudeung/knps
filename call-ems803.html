@@ -1,311 +1,2767 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
+
 <meta charset="UTF-8">
+
 <title>🆘 팔공산 산악사고 신고/접수/대응 상황판</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+
+<!-- =====================================================
+     카카오맵 SDK
+====================================================== -->
+
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=ff9e145029506d6e4c72d1f2b01ea424&libraries=services"></script>
 
+
 <style>
-body{margin:0;font-family:Arial;background:#111;color:#fff;}
-header{background:#b71c1c;padding:15px;text-align:center;font-size:20px;}
-.container{padding:15px;}
-#map{width:100%;height:350px;margin-bottom:15px;border-radius:6px;}
 
-.card{background:#1e1e1e;padding:12px;margin-bottom:10px;border-radius:6px;cursor:pointer;}
-.card.done{opacity:0.5;background:#2b2b2b;}
+/* =====================================================
+   기본
+====================================================== */
 
-.stats{display:flex;gap:10px;margin-bottom:15px;font-size:16px;}
-.stat-box{flex:1;padding:10px;border-radius:6px;background:#222;text-align:center;}
-.stat-box span{font-size:24px;font-weight:bold;display:block;}
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#111;
+    color:#fff;
+}
 
-#filterBox{display:flex;gap:10px;margin-bottom:10px;align-items:center;justify-content:flex-end;}
-#modalOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:9999;}
-#modalContent{background:#222;padding:20px;border-radius:8px;max-width:400px;width:90%;}
-#modalContent h3{margin-top:0;}
-#closeModal{cursor:pointer;background:#e53935;border:none;padding:6px 12px;color:#fff;border-radius:4px;margin-top:10px;}
+header{
+    background:#b71c1c;
+    padding:15px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+}
 
-#sheetTableContainer{margin-top:20px;}
-#sheetTable th, #sheetTable td{padding:6px;text-align:center;}
-#sheetTable tr:nth-child(even){background:#1a1a1a;}
+.container{
+    padding:15px;
+}
+
+
+/* =====================================================
+   지도
+====================================================== */
+
+#map{
+    width:100%;
+    height:65vh;
+    min-height:450px;
+    max-height:750px;
+    margin-bottom:15px;
+    border-radius:6px;
+    overflow:hidden;
+}
+
+
+/* =====================================================
+   신고 카드
+====================================================== */
+
+.card{
+    background:#1e1e1e;
+    padding:12px;
+    margin-bottom:10px;
+    border-radius:6px;
+    border:1px solid #333;
+}
+
+.card.done{
+    background:#2b2b2b;
+    opacity:0.6;
+}
+
+
+/* =====================================================
+   시간
+====================================================== */
+
+.time{
+    color:#ffcc00;
+    font-size:14px;
+    margin-bottom:4px;
+}
+
+
+/* =====================================================
+   좌표
+====================================================== */
+
+.coord{
+    font-size:12px;
+    color:#aaa;
+    margin-top:6px;
+    margin-bottom:6px;
+}
+
+
+/* =====================================================
+   지도 링크
+====================================================== */
+
+.maplink{
+    color:#4fc3f7;
+    font-size:13px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+.maplink:hover{
+    text-decoration:underline;
+}
+
+
+/* =====================================================
+   완료 버튼
+====================================================== */
+
+.complete-btn{
+    background:#2e7d32;
+    margin-top:8px;
+    color:#fff;
+    border:none;
+    padding:7px 12px;
+    border-radius:4px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.complete-btn:hover{
+    opacity:0.8;
+}
+
+
+/* =====================================================
+   삭제 버튼
+====================================================== */
+
+.delete-btn{
+    background:#c62828;
+    margin-top:10px;
+    color:#fff;
+    border:none;
+    padding:8px 14px;
+    border-radius:4px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.delete-btn:hover{
+    background:#e53935;
+}
+
+
+/* =====================================================
+   비밀번호 입력 모달
+====================================================== */
+
+.password-modal{
+
+    display:none;
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.80);
+
+    z-index:999999;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:15px;
+
+    box-sizing:border-box;
+}
+
+
+.password-modal.show{
+
+    display:flex !important;
+
+}
+
+
+.password-box{
+
+    width:100%;
+    max-width:380px;
+
+    background:#222;
+
+    border:2px solid #c62828;
+
+    border-radius:10px;
+
+    padding:22px;
+
+    box-sizing:border-box;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.8);
+
+}
+
+
+.password-title{
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    margin-bottom:10px;
+
+    color:#fff;
+
+}
+
+
+.password-description{
+
+    font-size:14px;
+
+    color:#bbb;
+
+    line-height:1.5;
+
+    margin-bottom:15px;
+
+}
+
+
+.password-input{
+
+    display:block;
+
+    width:100%;
+
+    box-sizing:border-box;
+
+    padding:13px;
+
+    background:#111;
+
+    color:#fff;
+
+    border:1px solid #666;
+
+    border-radius:6px;
+
+    font-size:16px;
+
+    outline:none;
+
+}
+
+
+.password-input:focus{
+
+    border-color:#ff5252;
+
+    box-shadow:
+        0 0 0 2px rgba(255,82,82,0.2);
+
+}
+
+
+.password-buttons{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-top:15px;
+
+}
+
+
+.password-confirm{
+
+    flex:1;
+
+    background:#c62828;
+
+    color:#fff;
+
+    border:none;
+
+    padding:12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+}
+
+
+.password-confirm:hover{
+
+    background:#e53935;
+
+}
+
+
+.password-confirm:disabled{
+
+    background:#666;
+
+    cursor:not-allowed;
+
+}
+
+
+.password-cancel{
+
+    flex:1;
+
+    background:#555;
+
+    color:#fff;
+
+    border:none;
+
+    padding:12px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    font-size:14px;
+
+}
+
+
+.password-cancel:hover{
+
+    background:#666;
+
+}
+
+
+/* =====================================================
+   3분 초과 응급환자 깜빡임
+====================================================== */
+
+@keyframes blinkEmergency{
+
+    0%{
+
+        box-shadow:
+            0 0 5px #ff1744;
+
+    }
+
+    50%{
+
+        box-shadow:
+            0 0 25px #ff1744,
+            0 0 40px #ff1744;
+
+    }
+
+    100%{
+
+        box-shadow:
+            0 0 5px #ff1744;
+
+    }
+
+}
+
+
+.card.blink{
+
+    animation:
+        blinkEmergency 1s infinite;
+
+}
+
+
+/* =====================================================
+   상태 표시
+====================================================== */
+
+.status{
+
+    display:inline-block;
+
+    padding:5px 9px;
+
+    border-radius:5px;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+    margin-bottom:7px;
+
+}
+
+
+.status.received{
+
+    background:#d50000;
+
+    color:#fff;
+
+}
+
+
+.status.arrived{
+
+    background:#ef6c00;
+
+    color:#fff;
+
+}
+
+
+.status.done{
+
+    background:#777;
+
+    color:#fff;
+
+}
+
+
+/* =====================================================
+   모바일
+====================================================== */
+
+@media(max-width:600px){
+
+    header{
+
+        font-size:18px;
+
+        padding:13px;
+
+    }
+
+
+    .container{
+
+        padding:10px;
+
+    }
+
+
+    #map{
+
+        height:65vh;
+
+        min-height:400px;
+
+        max-height:none;
+
+    }
+
+
+    .password-box{
+
+        max-width:100%;
+
+    }
+
+}
+
 </style>
+
 </head>
+
 
 <body>
 
 
-<header>🆘 팔공산 산악사고 신고/접수/대응 상황판</header>
+<!-- =====================================================
+     제목
+====================================================== -->
+
+<header>
+
+   🆘 팔공산 산악사고 신고/접수/대응 상황판
+
+</header>
+
+
+<!-- =====================================================
+     알림음
+====================================================== -->
+
+<audio id="alertSound">
+
+    <source
+        src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"
+        type="audio/ogg"
+    >
+
+</audio>
+
+
+<!-- =====================================================
+     지도
+====================================================== -->
 
 <div class="container">
 
-<div class="stats">
-  <div class="stat-box">🚑 응급환자<span id="statEmergency">0</span></div>
-  <div class="stat-box">🚓 구조출동<span id="statDispatch">0</span></div>
-  <div class="stat-box">🆘 조난<span id="statLost">0</span></div>
-  <div class="stat-box">✏ 기타<span id="statOther">0</span></div>
-</div>
-
-<div id="map"></div>
-<div id="listArea"></div>
-
-<div id="sheetTableContainer">
-  <table id="sheetTable" border="1" style="width:100%;color:#fff;">
-    <thead>
-      <tr>
-        <th>시간</th><th>유형</th><th>주소</th><th>전화</th><th>증상</th><th>상태</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+    <div id="map"></div>
 
 </div>
 
-<div id="modalOverlay">
-  <div id="modalContent">
-    <h3>상세 정보</h3>
-    <div id="modalBody"></div>
-    <button onclick="closeModal()">닫기</button>
-  </div>
+
+<!-- =====================================================
+     신고 목록
+====================================================== -->
+
+<div class="container">
+
+    <div id="listArea">
+        로딩중...
+    </div>
+
 </div>
+
+
+<br>
+
+
+<!-- =====================================================
+     관리자 비밀번호 입력 모달
+====================================================== -->
+
+<div
+    id="passwordModal"
+    class="password-modal"
+>
+
+    <div
+        class="password-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="passwordTitle"
+    >
+
+        <div
+            id="passwordTitle"
+            class="password-title"
+        >
+
+            🔐 관리자 인증
+
+        </div>
+
+
+        <div class="password-description">
+
+            신고를 삭제하려면 관리자 비밀번호를 입력하세요.
+
+        </div>
+
+
+        <input
+            id="deletePasswordInput"
+            class="password-input"
+            type="password"
+            placeholder="관리자 비밀번호"
+            autocomplete="off"
+        >
+
+
+        <div class="password-buttons">
+
+            <button
+                id="passwordCancelBtn"
+                class="password-cancel"
+                type="button"
+            >
+
+                취소
+
+            </button>
+
+
+            <button
+                id="passwordConfirmBtn"
+                class="password-confirm"
+                type="button"
+            >
+
+                🗑 삭제 진행
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
 
 
-const API_URL="https://script.google.com/macros/s/AKfycbwY0Z_EZw5qHZsrAX7jFHzx5Q43wi9O0wJfh6EgceptwOMo6x0VbXXhJYelAQlEgrXc/exec";
+/* =====================================================
+   지도 초기화
+====================================================== */
 
-let map, markers=[], allData=[];
-let lastDataLength = 0;
+let map;
 
-window.onload=function(){
-  initMap();
-  loadData();
-  setInterval(loadData,10000);
-};
+let markers = [];
 
-/* 시간 */
-function parseKST(dateStr){
-  if(!dateStr) return null;
-  const d = new Date(dateStr);
-  if(isNaN(d)) return null;
-  return d;
-}
 
-function formatTime(date){
-  return date ? date.toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}) : "";
-}
-
-/* 지도 */
 function initMap(){
-  map=new kakao.maps.Map(document.getElementById("map"),{
-    center:new kakao.maps.LatLng(35.998919, 128.607868),
-    level:6
-  });
+
+    map =
+        new kakao.maps.Map(
+
+            document.getElementById("map"),
+
+            {
+
+                center:
+                    new kakao.maps.LatLng(
+                        35.1345,
+                        126.9902
+                    ),
+
+                level:6
+
+            }
+
+        );
+
 }
 
-/* 모달 */
-function showModal(item){
-  document.getElementById("modalOverlay").style.display="flex";
-  document.getElementById("modalBody").innerHTML=`
-    🕒 ${formatTime(parseKST(item.time))}<br>
-    🚨 ${item.type}<br>
-    🏠 ${item.address}<br>
-    📞 ${item.phone||''}<br>
-    📝 ${item.symptom||''}<br>
-    상태: ${item.status||''}
-  `;
+
+initMap();
+
+
+/* =====================================================
+   Google Apps Script API
+====================================================== */
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbwY0Z_EZw5qHZsrAX7jFHzx5Q43wi9O0wJfh6EgceptwOMo6x0VbXXhJYelAQlEgrXc/exec";
+
+
+const listArea =
+    document.getElementById(
+        "listArea"
+    );
+
+
+/* =====================================================
+   비밀번호 모달 요소
+====================================================== */
+
+const passwordModal =
+    document.getElementById(
+        "passwordModal"
+    );
+
+
+const deletePasswordInput =
+    document.getElementById(
+        "deletePasswordInput"
+    );
+
+
+const passwordCancelBtn =
+    document.getElementById(
+        "passwordCancelBtn"
+    );
+
+
+const passwordConfirmBtn =
+    document.getElementById(
+        "passwordConfirmBtn"
+    );
+
+
+/* =====================================================
+   현재 삭제 대상 ID
+====================================================== */
+
+let pendingDeleteId =
+    null;
+
+
+/* =====================================================
+   비밀번호 입력창 열기
+====================================================== */
+
+function openPasswordModal(id){
+
+    if(!id){
+
+        alert(
+            "삭제할 신고 ID가 없습니다."
+        );
+
+        return;
+
+    }
+
+
+    pendingDeleteId =
+        String(id);
+
+
+    deletePasswordInput.value =
+        "";
+
+
+    passwordModal.classList.add(
+        "show"
+    );
+
+
+    document.body.style.overflow =
+        "hidden";
+
+
+    setTimeout(
+
+        function(){
+
+            deletePasswordInput.focus();
+
+        },
+
+        100
+
+    );
+
 }
 
-function closeModal(){
-  document.getElementById("modalOverlay").style.display="none";
+
+/* =====================================================
+   비밀번호 입력창 닫기
+====================================================== */
+
+function closePasswordModal(){
+
+    passwordModal.classList.remove(
+        "show"
+    );
+
+
+    document.body.style.overflow =
+        "";
+
+
+    deletePasswordInput.value =
+        "";
+
+
+    pendingDeleteId =
+        null;
+
 }
 
-/* 통계 */
-function updateStats(data){
-  let emergency=0, dispatch=0, lost=0, other=0;
 
-  data.forEach(item=>{
-    const t = (item.type || "");
+/* =====================================================
+   삭제 버튼
+====================================================== */
 
-    if(t.includes("응급")){
-      emergency++;
-    }
-    else if(t.includes("구조") || t.includes("산악사고")){
-      dispatch++;
-    }
-    else if(t.includes("조난") || t.includes("실종")){
-      lost++;
-    }
-    else{
-      other++;
-    }
-  });
+function deleteCase(id){
 
-  document.getElementById("statEmergency").innerText = emergency;
-  document.getElementById("statDispatch").innerText = dispatch;
-  document.getElementById("statLost").innerText = lost;
-  document.getElementById("statOther").innerText = other;
+    openPasswordModal(id);
+
 }
 
-/* 🚨 긴급 알림 */
-function triggerAlert(item){
 
-  const msg = `🚨 긴급 접수
-유형: ${item.type}
-주소: ${item.address}
-상태: ${item.status || ""}`;
+/* =====================================================
+   취소
+====================================================== */
 
-  // 브라우저 알림
-  if("Notification" in window){
-    if(Notification.permission === "granted"){
-      new Notification("산악사고 긴급", { body: item.type });
-    } else {
-      Notification.requestPermission();
-    }
-  }
+passwordCancelBtn.addEventListener(
 
-  // 화면 팝업
-  const popup=document.createElement("div");
-  popup.style.position="fixed";
-  popup.style.top="20px";
-  popup.style.right="20px";
-  popup.style.background="#b71c1c";
-  popup.style.color="#fff";
-  popup.style.padding="12px";
-  popup.style.borderRadius="8px";
-  popup.style.zIndex="99999";
-  popup.style.maxWidth="260px";
-  popup.style.boxShadow="0 0 10px rgba(0,0,0,0.5)";
-  popup.style.whiteSpace="pre-line";
+    "click",
 
-  popup.innerText=msg;
+    function(){
 
-  document.body.appendChild(popup);
+        closePasswordModal();
 
-  setTimeout(()=>popup.remove(),5000);
-}
-
-/* 렌더 */
-function renderData(data){
-
-  document.getElementById("listArea").innerHTML="";
-
-  markers.forEach(m=>m.setMap(null));
-  markers=[];
-
-  updateStats(data);
-
-  let bounds=new kakao.maps.LatLngBounds();
-
-  data.forEach(item=>{
-    const lat=parseFloat(item.lat||item.latitude);
-    const lng=parseFloat(item.lng||item.longitude);
-
-    if(!isNaN(lat)&&!isNaN(lng)){
-
-      let iconUrl;
-
-      const t = (item.type || "");
-
-      if(t.includes("응급")){
-        iconUrl="https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-      }
-      else if(t.includes("구조") || t.includes("산악사고")){
-        iconUrl="https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-      }
-      else if(t.includes("조난") || t.includes("실종")){
-        iconUrl="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-      }
-      else{
-        iconUrl="https://maps.google.com/mapfiles/ms/icons/green-dot.png";
-      }
-
-      const marker=new kakao.maps.Marker({
-        map:map,
-        position:new kakao.maps.LatLng(lat,lng),
-        image:new kakao.maps.MarkerImage(iconUrl,new kakao.maps.Size(32,32))
-      });
-
-      kakao.maps.event.addListener(marker,'click',()=>showModal(item));
-
-      markers.push(marker);
-      bounds.extend(marker.getPosition());
     }
 
-    const div=document.createElement("div");
-    div.className="card";
-    div.innerText=`${formatTime(parseKST(item.time))} | ${item.type} | ${item.address}`;
-   div.onclick=()=>{
-  showModal(item);
+);
 
-  const lat=parseFloat(item.lat||item.latitude);
-  const lng=parseFloat(item.lng||item.longitude);
 
-  if(!isNaN(lat)&&!isNaN(lng)){
-    const moveLatLng = new kakao.maps.LatLng(lat, lng);
+/* =====================================================
+   모달 바깥 클릭
+====================================================== */
 
-    map.setCenter(moveLatLng);
-    map.setLevel(3); // 🔥 확대 (숫자 작을수록 확대)
-  }
-};
+passwordModal.addEventListener(
 
-    document.getElementById("listArea").appendChild(div);
-  });
+    "click",
 
-  if(markers.length>0) map.setBounds(bounds);
+    function(e){
 
-  renderTable(data);
+        if(
+            e.target ===
+            passwordModal
+        ){
+
+            closePasswordModal();
+
+        }
+
+    }
+
+);
+
+
+/* =====================================================
+   키보드
+====================================================== */
+
+deletePasswordInput.addEventListener(
+
+    "keydown",
+
+    function(e){
+
+        if(
+            e.key === "Enter"
+        ){
+
+            e.preventDefault();
+
+            passwordConfirmBtn.click();
+
+        }
+
+
+        if(
+            e.key === "Escape"
+        ){
+
+            e.preventDefault();
+
+            closePasswordModal();
+
+        }
+
+    }
+
+);
+
+
+/* =====================================================
+   삭제 진행
+====================================================== */
+
+passwordConfirmBtn.addEventListener(
+
+    "click",
+
+    async function(){
+
+        const password =
+            deletePasswordInput.value;
+
+
+        if(
+            !password ||
+            !password.trim()
+        ){
+
+            alert(
+                "🔐 관리자 비밀번호를 입력하세요."
+            );
+
+
+            deletePasswordInput.focus();
+
+            return;
+
+        }
+
+
+        if(
+            !pendingDeleteId
+        ){
+
+            alert(
+                "삭제할 신고 ID를 찾을 수 없습니다."
+            );
+
+            closePasswordModal();
+
+            return;
+
+        }
+
+
+        const id =
+            pendingDeleteId;
+
+
+        /* 입력창 닫기 */
+
+        closePasswordModal();
+
+
+        /* =================================================
+           최종 확인
+        ================================================== */
+
+        if(
+            !confirm(
+
+                "⚠️ 정말 이 신고를 삭제하시겠습니까?\n\n" +
+
+                "삭제한 신고는 복구할 수 없습니다."
+
+            )
+        ){
+
+            return;
+
+        }
+
+
+        try{
+
+            passwordConfirmBtn.disabled =
+                true;
+
+
+            passwordConfirmBtn.innerText =
+                "삭제 확인 중...";
+
+
+            const response =
+                await fetch(
+
+                    API_URL,
+
+                    {
+
+                        method:"POST",
+
+                        headers:{
+
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                action:
+                                    "delete",
+
+                                id:
+                                    id,
+
+                                password:
+                                    password
+
+                            })
+
+                    }
+
+                );
+
+
+            if(
+                !response.ok
+            ){
+
+                throw new Error(
+                    "서버 응답 오류: " +
+                    response.status
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            if(
+                result.result ===
+                "success"
+            ){
+
+                alert(
+                    "✅ 신고가 삭제되었습니다."
+                );
+
+
+                loadData();
+
+            }
+
+            else{
+
+                alert(
+
+                    result.message ||
+
+                    "❌ 삭제할 수 없습니다."
+
+                );
+
+            }
+
+        }
+
+        catch(err){
+
+            console.error(
+                "삭제 오류:",
+                err
+            );
+
+
+            alert(
+                "❌ 삭제 처리 중 오류가 발생했습니다."
+            );
+
+        }
+
+        finally{
+
+            passwordConfirmBtn.disabled =
+                false;
+
+
+            passwordConfirmBtn.innerText =
+                "🗑 삭제 진행";
+
+        }
+
+    }
+
+);
+
+
+/* =====================================================
+   신규 신고 관리
+====================================================== */
+
+let knownIds =
+    new Set();
+
+
+let alertedOverdueIds =
+    new Set();
+
+
+let overdueIntervals =
+    new Map();
+
+
+let firstLoad =
+    true;
+
+
+/* =====================================================
+   상태 정규화
+====================================================== */
+
+function normalizeStatus(status){
+
+    const value =
+        String(
+            status || ""
+        )
+        .trim()
+        .toUpperCase();
+
+
+    if(
+
+        value === "DONE" ||
+
+        value === "완료" ||
+
+        value === "처리완료" ||
+
+        value === "사고처리완료"
+
+    ){
+
+        return "DONE";
+
+    }
+
+
+    if(
+
+        value === "ARRIVED" ||
+
+        value === "도착" ||
+
+        value === "현장도착"
+
+    ){
+
+        return "ARRIVED";
+
+    }
+
+
+    return "RECEIVED";
+
 }
 
-/* 테이블 */
-function renderTable(data){
-  const tbody=document.querySelector("#sheetTable tbody");
-  tbody.innerHTML="";
 
-  data.forEach(item=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${formatTime(parseKST(item.time))}</td>
-      <td>${item.type}</td>
-      <td>${item.address}</td>
-      <td>${item.phone||''}</td>
-      <td>${item.symptom||''}</td>
-      <td>${item.status||''}</td>
+/* =====================================================
+   경과시간
+====================================================== */
+
+function getElapsedTime(
+
+    startTime,
+
+    endTime = null
+
+){
+
+    if(!startTime){
+
+        return "0분 0초 경과";
+
+    }
+
+
+    const start =
+        new Date(startTime);
+
+
+    const end =
+        endTime
+        ?
+        new Date(endTime)
+        :
+        new Date();
+
+
+    if(
+        Number.isNaN(
+            start.getTime()
+        )
+    ){
+
+        return "시간 확인 불가";
+
+    }
+
+
+    const diff =
+        Math.max(
+
+            0,
+
+            Math.floor(
+
+                (
+                    end - start
+                ) / 1000
+
+            )
+
+        );
+
+
+    const h =
+        Math.floor(
+            diff / 3600
+        );
+
+
+    const m =
+        Math.floor(
+
+            (
+                diff % 3600
+            ) / 60
+
+        );
+
+
+    const s =
+        diff % 60;
+
+
+    if(
+        h > 0
+    ){
+
+        return `${h}시간 ${m}분 ${s}초 경과`;
+
+    }
+
+
+    return `${m}분 ${s}초 경과`;
+
+}
+
+
+/* =====================================================
+   마커 색상
+====================================================== */
+
+function getMarkerColor(status){
+
+    const normalized =
+        normalizeStatus(status);
+
+
+    if(
+        normalized === "DONE"
+    ){
+
+        return "#777777";
+
+    }
+
+
+    if(
+        normalized === "ARRIVED"
+    ){
+
+        return "#fb8c00";
+
+    }
+
+
+    return "#e53935";
+
+}
+
+
+/* =====================================================
+   마커 이미지
+====================================================== */
+
+function createMarkerImage(status){
+
+    const color =
+        getMarkerColor(status);
+
+
+    const svg = `
+
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="44"
+            height="44"
+            viewBox="0 0 44 44"
+        >
+
+            <circle
+                cx="22"
+                cy="22"
+                r="19"
+                fill="${color}"
+                stroke="#ffffff"
+                stroke-width="3"
+            />
+
+            <circle
+                cx="22"
+                cy="22"
+                r="7"
+                fill="#ffffff"
+            />
+
+        </svg>
+
     `;
-    tbody.appendChild(tr);
-  });
+
+
+    return new kakao.maps.MarkerImage(
+
+        "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent(svg),
+
+        new kakao.maps.Size(
+            44,
+            44
+        ),
+
+        {
+
+            offset:
+                new kakao.maps.Point(
+                    22,
+                    22
+                )
+
+        }
+
+    );
+
 }
 
-/* 데이터 로드 + 신규 감지 */
-async function loadData(){
-  try{
-    const res=await fetch(API_URL+"?action=list");
-    let data=await res.json();
 
-    if(!Array.isArray(data)) data=[];
+/* =====================================================
+   지도 팝업
+====================================================== */
 
-    // 🔥 신규 데이터 감지
-    if(lastDataLength > 0 && data.length > lastDataLength){
-      const newItems = data.slice(0, data.length - lastDataLength);
-      newItems.forEach(triggerAlert);
+function createInfoWindow(
+
+    item,
+
+    lat,
+
+    lng
+
+){
+
+    const normalized =
+        normalizeStatus(
+            item.status
+        );
+
+
+    let statusColor =
+        "#e53935";
+
+
+    let statusText =
+        "🔴 사고 접수";
+
+
+    if(
+        normalized ===
+        "ARRIVED"
+    ){
+
+        statusColor =
+            "#fb8c00";
+
+        statusText =
+            "🟠 현장도착";
+
     }
 
-    lastDataLength = data.length;
 
-    allData=data;
-    renderData(allData);
+    if(
+        normalized ===
+        "DONE"
+    ){
 
-  }catch(e){
-    document.getElementById("listArea").innerText="❌ 데이터 로딩 오류";
-  }
+        statusColor =
+            "#777777";
+
+        statusText =
+            "⚪ 사고처리완료";
+
+    }
+
+
+    const infoContent = `
+
+        <div style="
+            padding:12px;
+            color:#222;
+            font-family:Arial,sans-serif;
+            font-size:13px;
+            min-width:250px;
+            max-width:300px;
+            line-height:1.5;
+        ">
+
+            <div style="
+                font-size:16px;
+                font-weight:bold;
+                margin-bottom:8px;
+            ">
+
+                🆘 산악사고 신고
+
+            </div>
+
+
+            <div style="
+                display:inline-block;
+                padding:5px 10px;
+                background:${statusColor};
+                color:#fff;
+                border-radius:5px;
+                font-weight:bold;
+                margin-bottom:8px;
+            ">
+
+                ${statusText}
+
+            </div>
+
+
+            <br>
+
+
+            🚨 <b>신고유형</b><br>
+
+            ${item.type || "미입력"}
+
+
+            <br><br>
+
+
+            🕒 <b>접수시간</b><br>
+
+            ${
+                item.time
+                ?
+                new Date(
+                    item.time
+                ).toLocaleString()
+                :
+                ""
+            }
+
+
+            <br><br>
+
+
+            ⏱ <b>경과시간</b><br>
+
+            ${
+                getElapsedTime(
+                    item.time,
+                    item.finishTime
+                )
+            }
+
+
+            <br><br>
+
+
+            📝 <b>상황</b><br>
+
+            ${item.symptom || "내용없음"}
+
+
+            <br><br>
+
+
+            🏠 <b>주소</b><br>
+
+            ${item.address || "주소없음"}
+
+
+            <br><br>
+
+
+            📞 <b>연락처</b><br>
+
+            ${item.phone || "번호없음"}
+
+
+            <br><br>
+
+
+            📍 <b>좌표</b><br>
+
+            ${lat.toFixed(6)},
+            ${lng.toFixed(6)}
+
+
+            ${
+                item.completeTime
+                ?
+
+                `
+
+                <br><br>
+
+                🚑 <b>현장도착</b><br>
+
+                ${
+                    new Date(
+                        item.completeTime
+                    ).toLocaleString()
+                }
+
+                `
+
+                :
+
+                ""
+
+            }
+
+
+            ${
+                item.finishTime
+                ?
+
+                `
+
+                <br><br>
+
+                ⚪ <b>사고처리 완료</b><br>
+
+                ${
+                    new Date(
+                        item.finishTime
+                    ).toLocaleString()
+                }
+
+                `
+
+                :
+
+                ""
+
+            }
+
+
+            <div style="
+                margin-top:12px;
+            ">
+
+                <a
+
+                    href="https://map.kakao.com/link/map/구조요청 위치,${lat},${lng}"
+
+                    target="_blank"
+
+                    style="
+                        color:#1976d2;
+                        text-decoration:none;
+                        font-weight:bold;
+                    "
+                >
+
+                    📍 카카오맵에서 보기
+
+                </a>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    return new kakao.maps.InfoWindow({
+
+        content:
+            infoContent,
+
+        removable:
+            true
+
+    });
+
 }
+
+
+/* =====================================================
+   3분 초과 응급환자
+====================================================== */
+
+function checkOverdue(
+
+    item,
+
+    div
+
+){
+
+    if(
+        item.type !==
+        "응급환자"
+    ){
+
+        return;
+
+    }
+
+
+    const normalized =
+        normalizeStatus(
+            item.status
+        );
+
+
+    if(
+        normalized ===
+        "DONE"
+    ){
+
+        return;
+
+    }
+
+
+    if(!item.time){
+
+        return;
+
+    }
+
+
+    const diffSeconds =
+        Math.floor(
+
+            (
+                new Date() -
+                new Date(item.time)
+            ) / 1000
+
+        );
+
+
+    if(
+        diffSeconds >= 180
+    ){
+
+        div.classList.add(
+            "blink"
+        );
+
+
+        if(
+            alertedOverdueIds.has(
+                item.id
+            )
+        ){
+
+            return;
+
+        }
+
+
+        alertedOverdueIds.add(
+            item.id
+        );
+
+
+        const interval =
+            setInterval(
+
+                () => {
+
+                    if(
+                        div.classList.contains(
+                            "done"
+                        )
+                    ){
+
+                        clearInterval(
+                            interval
+                        );
+
+
+                        overdueIntervals.delete(
+                            item.id
+                        );
+
+
+                        return;
+
+                    }
+
+
+                    const alertSound =
+                        document.getElementById(
+                            "alertSound"
+                        );
+
+
+                    alertSound.currentTime =
+                        0;
+
+
+                    alertSound.play()
+                    .catch(
+                        () => {}
+                    );
+
+                },
+
+                30000
+
+            );
+
+
+        overdueIntervals.set(
+            item.id,
+            interval
+        );
+
+
+        const alertSound =
+            document.getElementById(
+                "alertSound"
+            );
+
+
+        alertSound.currentTime =
+            0;
+
+
+        alertSound.play()
+        .catch(
+            () => {}
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   현장도착
+====================================================== */
+
+async function completeCase(id){
+
+    if(
+        !confirm(
+            "구조대원이 현장에 도착했습니까?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    try{
+
+        await fetch(
+
+            API_URL,
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        action:
+                            "complete",
+
+                        id:
+                            id
+
+                    })
+
+            }
+
+        );
+
+
+        loadData();
+
+    }
+
+    catch(err){
+
+        console.error(
+            err
+        );
+
+
+        alert(
+            "현장도착 처리 중 오류가 발생했습니다."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   사고처리 완료
+====================================================== */
+
+async function finishCase(id){
+
+    if(
+        !confirm(
+            "사고처리를 완료하시겠습니까?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    try{
+
+        await fetch(
+
+            API_URL,
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        action:
+                            "finish",
+
+                        id:
+                            id
+
+                    })
+
+            }
+
+        );
+
+
+        loadData();
+
+    }
+
+    catch(err){
+
+        console.error(
+            err
+        );
+
+
+        alert(
+            "사고처리 완료 중 오류가 발생했습니다."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   신고 목록
+====================================================== */
+
+async function loadData(){
+
+    try{
+
+        const res =
+            await fetch(
+
+                API_URL +
+                "?action=list"
+
+            );
+
+
+        const data =
+            await res.json();
+
+
+        listArea.innerHTML =
+            "";
+
+
+        /* =================================================
+           기존 마커 제거
+        ================================================== */
+
+        markers.forEach(
+
+            marker => {
+
+                marker.setMap(
+                    null
+                );
+
+            }
+
+        );
+
+
+        markers = [];
+
+
+        /* =================================================
+           신고 없음
+        ================================================== */
+
+        if(
+            !data.length
+        ){
+
+            listArea.innerHTML =
+                "현재 접수된 신고가 없습니다.";
+
+            return;
+
+        }
+
+
+        /* =================================================
+           신규 신고 확인
+        ================================================== */
+
+        if(
+            firstLoad
+        ){
+
+            data.forEach(
+
+                item => {
+
+                    knownIds.add(
+                        String(item.id)
+                    );
+
+                }
+
+            );
+
+
+            firstLoad =
+                false;
+
+        }
+
+        else{
+
+            data.forEach(
+
+                item => {
+
+                    const itemId =
+                        String(
+                            item.id
+                        );
+
+
+                    if(
+                        !knownIds.has(
+                            itemId
+                        )
+                    ){
+
+                        knownIds.add(
+                            itemId
+                        );
+
+
+                        alert(
+                            "🚨 새로운 신고 접수!"
+                        );
+
+
+                        const alertSound =
+                            document.getElementById(
+                                "alertSound"
+                            );
+
+
+                        alertSound.currentTime =
+                            0;
+
+
+                        alertSound.play()
+                        .catch(
+                            () => {}
+                        );
+
+                    }
+
+                }
+
+            );
+
+        }
+
+
+        /* =================================================
+           최신 신고순
+        ================================================== */
+
+        data.sort(
+
+            (a,b) =>
+
+                new Date(
+                    b.time
+                ) -
+
+                new Date(
+                    a.time
+                )
+
+        );
+
+
+        /* =================================================
+           신고 데이터
+        ================================================== */
+
+        data.forEach(
+
+            item => {
+
+                const normalizedStatus =
+                    normalizeStatus(
+                        item.status
+                    );
+
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "card" +
+
+                    (
+
+                        normalizedStatus ===
+                        "DONE"
+
+                        ?
+
+                        " done"
+
+                        :
+
+                        ""
+
+                    );
+
+
+                div.setAttribute(
+                    "data-time",
+                    item.time || ""
+                );
+
+
+                if(
+                    item.finishTime
+                ){
+
+                    div.setAttribute(
+                        "data-finish-time",
+                        item.finishTime
+                    );
+
+                }
+
+
+                /* =========================================
+                   상태
+                ========================================= */
+
+                let statusHTML =
+                    "";
+
+
+                if(
+                    normalizedStatus ===
+                    "DONE"
+                ){
+
+                    statusHTML = `
+
+                        <div class="status done">
+
+                            ⚪ 사고처리완료
+
+                        </div>
+
+                    `;
+
+                }
+
+                else if(
+                    normalizedStatus ===
+                    "ARRIVED"
+                ){
+
+                    statusHTML = `
+
+                        <div class="status arrived">
+
+                            🟠 현장도착
+
+                        </div>
+
+                    `;
+
+                }
+
+                else{
+
+                    statusHTML = `
+
+                        <div class="status received">
+
+                            🔴 사고 접수
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =========================================
+                   현장도착 시간
+                ========================================= */
+
+                let completeHTML =
+                    "";
+
+
+                if(
+                    item.completeTime
+                ){
+
+                    completeHTML = `
+
+                        <div class="time">
+
+                            🚑 현장도착:
+
+                            ${
+                                new Date(
+                                    item.completeTime
+                                ).toLocaleString()
+                            }
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =========================================
+                   완료 시간
+                ========================================= */
+
+                let finishHTML =
+                    "";
+
+
+                if(
+                    item.finishTime
+                ){
+
+                    finishHTML = `
+
+                        <div class="time">
+
+                            ✅ 사고처리 완료:
+
+                            ${
+                                new Date(
+                                    item.finishTime
+                                ).toLocaleString()
+                            }
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                /* =========================================
+                   버튼
+                ========================================= */
+
+                let buttonHTML =
+                    "";
+
+
+                /* =========================================
+                   완료 → 삭제
+                ========================================= */
+
+                if(
+                    normalizedStatus ===
+                    "DONE"
+                ){
+
+                    buttonHTML = `
+
+                        <span style="
+                            display:inline-block;
+                            margin-top:8px;
+                            color:#aaa;
+                            font-weight:bold;
+                        ">
+
+                            ✔ 처리완료
+
+                        </span>
+
+
+                        <br>
+
+
+                        <button
+
+                            class="delete-btn"
+
+                            type="button"
+
+                        >
+
+                            🗑 신고 삭제
+
+                        </button>
+
+                    `;
+
+                }
+
+
+                /* =========================================
+                   현장도착 → 사고처리 완료
+                ========================================= */
+
+                else if(
+                    normalizedStatus ===
+                    "ARRIVED"
+                ){
+
+                    buttonHTML = `
+
+                        <button
+
+                            class="complete-btn"
+
+                            type="button"
+
+                        >
+
+                            ✅ 사고처리 완료
+
+                        </button>
+
+                    `;
+
+                }
+
+
+                /* =========================================
+                   접수 → 현장도착
+                ========================================= */
+
+                else{
+
+                    buttonHTML = `
+
+                        <button
+
+                            class="complete-btn"
+
+                            type="button"
+
+                        >
+
+                            🚑 구조대원 현장도착
+
+                        </button>
+
+                    `;
+
+                }
+
+
+                /* =========================================
+                   카드
+                ========================================= */
+
+                div.innerHTML = `
+
+                    <div class="time">
+
+                        🕒 접수:
+
+                        ${
+                            item.time
+                            ?
+                            new Date(
+                                item.time
+                            ).toLocaleString()
+                            :
+                            ""
+                        }
+
+                    </div>
+
+
+                    <div class="time elapsed">
+
+                        ⏱
+                        ${
+                            getElapsedTime(
+                                item.time,
+                                item.finishTime
+                            )
+                        }
+
+                    </div>
+
+
+                    ${statusHTML}
+
+
+                    ${completeHTML}
+
+
+                    ${finishHTML}
+
+
+                    <div style="
+                        margin-top:5px;
+                        font-size:15px;
+                        font-weight:bold;
+                        color:#ff5252;
+                    ">
+
+                        🚨
+                        ${
+                            item.type ||
+                            "미입력"
+                        }
+
+                    </div>
+
+
+                    <br>
+
+
+                    🏠
+                    ${item.address || "주소없음"}
+
+                    <br><br>
+
+
+                    📞
+                    ${item.phone || "번호없음"}
+
+                    <br><br>
+
+
+                    📝
+                    ${item.symptom || "내용없음"}
+
+
+                    <div class="coord">
+
+                        위도:
+                        ${item.lat}
+
+                        /
+
+                        경도:
+                        ${item.lng}
+
+                    </div>
+
+
+                    <a
+
+                        class="maplink"
+
+                        href="https://map.kakao.com/link/map/구조요청 위치,${item.lat},${item.lng}"
+
+                        target="_blank"
+
+                    >
+
+                        📍 지도보기
+
+                    </a>
+
+
+                    <br>
+
+
+                    ${buttonHTML}
+
+                `;
+
+
+                listArea.appendChild(
+                    div
+                );
+
+
+                /* =========================================
+                   버튼 이벤트 직접 연결
+                   ※ inline onclick 사용하지 않음
+                ========================================= */
+
+                const deleteButton =
+                    div.querySelector(
+                        ".delete-btn"
+                    );
+
+
+                if(
+                    deleteButton
+                ){
+
+                    deleteButton.addEventListener(
+
+                        "click",
+
+                        function(){
+
+                            openPasswordModal(
+                                item.id
+                            );
+
+                        }
+
+                    );
+
+                }
+
+
+                const completeButton =
+                    div.querySelector(
+                        ".complete-btn"
+                    );
+
+
+                if(
+                    completeButton
+                ){
+
+                    completeButton.addEventListener(
+
+                        "click",
+
+                        function(){
+
+                            if(
+                                normalizedStatus ===
+                                "ARRIVED"
+                            ){
+
+                                finishCase(
+                                    item.id
+                                );
+
+                            }
+
+                            else{
+
+                                completeCase(
+                                    item.id
+                                );
+
+                            }
+
+                        }
+
+                    );
+
+                }
+
+
+                /* =========================================
+                   3분 초과
+                ========================================= */
+
+                checkOverdue(
+                    item,
+                    div
+                );
+
+
+                /* =========================================
+                   지도 마커
+                ========================================= */
+
+                if(
+                    item.lat &&
+                    item.lng
+                ){
+
+                    const lat =
+                        Number(
+                            item.lat
+                        );
+
+
+                    const lng =
+                        Number(
+                            item.lng
+                        );
+
+
+                    if(
+
+                        Number.isFinite(lat) &&
+                        Number.isFinite(lng)
+
+                    ){
+
+                        const position =
+                            new kakao.maps.LatLng(
+                                lat,
+                                lng
+                            );
+
+
+                        const markerImage =
+                            createMarkerImage(
+                                item.status
+                            );
+
+
+                        const marker =
+                            new kakao.maps.Marker({
+
+                                map:
+                                    map,
+
+                                position:
+                                    position,
+
+                                title:
+                                    item.type ||
+                                    "산악사고 신고",
+
+                                image:
+                                    markerImage
+
+                            });
+
+
+                        markers.push(
+                            marker
+                        );
+
+
+                        const infoWindow =
+                            createInfoWindow(
+
+                                item,
+
+                                lat,
+
+                                lng
+
+                            );
+
+
+                        kakao.maps.event.addListener(
+
+                            marker,
+
+                            "click",
+
+                            function(){
+
+                                infoWindow.open(
+                                    map,
+                                    marker
+                                );
+
+                            }
+
+                        );
+
+                    }
+
+                }
+
+            }
+
+        );
+
+
+        /* =================================================
+           지도 범위
+        ================================================== */
+
+        if(
+            markers.length > 0
+        ){
+
+            const bounds =
+                new kakao.maps.LatLngBounds();
+
+
+            markers.forEach(
+
+                marker => {
+
+                    bounds.extend(
+                        marker.getPosition()
+                    );
+
+                }
+
+            );
+
+
+            map.setBounds(
+                bounds
+            );
+
+        }
+
+    }
+
+    catch(err){
+
+        console.error(
+            "데이터 로딩 오류:",
+            err
+        );
+
+
+        listArea.innerHTML =
+            "구글시트 로딩 실패. 콘솔 확인";
+
+    }
+
+}
+
+
+/* =====================================================
+   최초 로딩
+====================================================== */
+
+loadData();
+
+
+/* =====================================================
+   10초마다 갱신
+====================================================== */
+
+setInterval(
+
+    loadData,
+
+    10000
+
+);
+
+
+/* =====================================================
+   경과시간 1초마다 갱신
+====================================================== */
+
+setInterval(
+
+    function(){
+
+        document
+        .querySelectorAll(
+            ".card"
+        )
+        .forEach(
+
+            function(card){
+
+                const elapsedEl =
+                    card.querySelector(
+                        ".time.elapsed"
+                    );
+
+
+                const timeAttr =
+                    card.getAttribute(
+                        "data-time"
+                    );
+
+
+                const finishTimeAttr =
+                    card.getAttribute(
+                        "data-finish-time"
+                    );
+
+
+                if(
+                    !elapsedEl ||
+                    !timeAttr
+                ){
+
+                    return;
+
+                }
+
+
+                elapsedEl.innerText =
+
+                    "⏱ " +
+
+                    getElapsedTime(
+
+                        timeAttr,
+
+                        finishTimeAttr
+
+                    );
+
+            }
+
+        );
+
+    },
+
+    1000
+
+);
+
 
 /* =====================================================
    우클릭 방지
 ====================================================== */
 
 document.addEventListener(
+
     "contextmenu",
+
     function(e){
 
         e.preventDefault();
@@ -313,6 +2769,7 @@ document.addEventListener(
         return false;
 
     }
+
 );
 
 
@@ -321,7 +2778,9 @@ document.addEventListener(
 ====================================================== */
 
 document.addEventListener(
+
     "keydown",
+
     function(e){
 
         /* F12 */
@@ -340,8 +2799,11 @@ document.addEventListener(
         /* Ctrl + U */
 
         if(
+
             e.ctrlKey &&
+
             e.key.toLowerCase() === "u"
+
         ){
 
             e.preventDefault();
@@ -354,9 +2816,13 @@ document.addEventListener(
         /* Ctrl + Shift + I */
 
         if(
+
             e.ctrlKey &&
+
             e.shiftKey &&
+
             e.key.toLowerCase() === "i"
+
         ){
 
             e.preventDefault();
@@ -369,9 +2835,13 @@ document.addEventListener(
         /* Ctrl + Shift + J */
 
         if(
+
             e.ctrlKey &&
+
             e.shiftKey &&
+
             e.key.toLowerCase() === "j"
+
         ){
 
             e.preventDefault();
@@ -384,9 +2854,13 @@ document.addEventListener(
         /* Ctrl + Shift + C */
 
         if(
+
             e.ctrlKey &&
+
             e.shiftKey &&
+
             e.key.toLowerCase() === "c"
+
         ){
 
             e.preventDefault();
@@ -399,8 +2873,11 @@ document.addEventListener(
         /* Ctrl + S */
 
         if(
+
             e.ctrlKey &&
+
             e.key.toLowerCase() === "s"
+
         ){
 
             e.preventDefault();
@@ -410,8 +2887,13 @@ document.addEventListener(
         }
 
     }
+
 );
-  
+
 </script>
+
+
 </body>
+
 </html>
+```
