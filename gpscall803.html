@@ -245,7 +245,6 @@ button:active {
   // 만료된 경우 암호 입력창을 열지 않음
   document.body.classList.add("link-expired");
 
-  const panel = document.getElementById("passwordPanel");
   const expiredPanel = document.getElementById("expiredPanel");
 
   if (panel) {
@@ -265,11 +264,6 @@ button:active {
 function sendSMS() {
   if (window.MUDEUNG_LINK_EXPIRED) {
     alert("링크 사용 기간이 만료되었습니다.");
-    return;
-  }
-
-  if (!document.body.classList.contains("password-verified")) {
-    alert("먼저 접속 암호를 확인해주세요.");
     return;
   }
 
