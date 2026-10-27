@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>무등산 산악구조 🆘 링크 문자전송</title>
+
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- =========================================
+     공유 링크 만료시간 확인
+     expires 값은 Unix 타임스탬프(밀리초)
+========================================= -->
+<script>
+(function () {
+    const params = new URLSearchParams(location.search);
+
+    // expires 매개변수가 없는 기존 주소는 그대로 사용
+    if (!params.has("expires")) {
+        window.MUDEUNG_LINK_EXPIRED = false;
+        return;
+    }
+
+    const rawExpires = params.get("expires");
+    const expires = Number(rawExpires);
+
+    window.MUDEUNG_LINK_EXPIRED =
+        rawExpires === "" ||
+        !Number.isSafeInteger(expires) ||
+        expires <= Date.now();
+})();
+</script>
+
+<style>
+:root {
+  color-scheme: light;
+  --primary: #b42318;
+  --surface: #fff;
+  --border: #d7dbe0;
+  --muted: #626b76;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 30px 16px;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+  text-align: center;
+}
+
+
+/* 만료된 경우 기존 콘텐츠 숨김 */
+body.link-expired > :not(#expiredPanel) {
+  display: none !important;
+}
+
+h1, h2 {
+  color: #ff4d4d;
+  margin-bottom: 20px;
+}
+
+.phone-input {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto 15px;
+  padding: 18px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+}
+
+.sms-button {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  background: #ff4d4d;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:active {
+  background: #cc0000;
+}
+
+.footer {
+  margin-top: 30px;
+  font-size: 13px;
+  color: #aaa;
+}
+     
+.phone-input {
+  display: block;
+  width: 90%;
+  max-width: 360px;
+  margin: 0 auto 15px;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+}
+
+.sms-button {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 18px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  background: #ff4d4d;
+  color: #fff;
+  cursor: pointer;
+}
+
+.sms-button:active {
+  background: #cc0000;
+}
+
+.footer {
+  margin-top: 30px;
+  font-size: 13px;
+  color: #aaa;
+}
+
+/* 링크 만료 안내 */
+.expired-panel {
+  width: min(420px, calc(100% - 32px));
+  margin: 60px auto;
+  padding: 28px 20px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  color: #20242a;
+  line-height: 1.7;
+  box-shadow: 0 18px 60px #00000025;
+}
+
+.expired-panel h2 {
+  margin: 0 0 16px;
+  color: #b42318;
+}
+
+.expired-panel p {
+  margin: 8px 0;
+}
+
+@media (max-width: 380px) {
+  body {
+    padding: 24px 12px;
+  }
+
+  .password-panel {
+    padding: 20px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================================
+     만료 링크 안내
+========================================= -->
+<div id="expiredPanel"
+     class="expired-panel"
+     role="alert"
+     style="display:none;">
+
+  <h2>링크 사용 기간 만료</h2>
+
+  <p>
+    이 공유 링크는 만료되었거나<br>
+    유효하지 않습니다.
+  </p>
+
+  <p>
+    새로운 링크를 발급받아 접속해 주세요.
+  </p>
+</div>
+
+
+
+<!-- =========================================
+     페이지 본문
+========================================= -->
+<h2>무등산 산악구조 🆘 링크 문자전송</h2>
+
+<p>
+  문자를 받을 번호를 입력한 후<br>
+  버튼을 눌러주세요.
+</p>
+
+<!-- 받는 사람 전화번호 -->
+<input
+  class="phone-input"
+  type="tel"
+  id="phone"
+  placeholder="받는 사람 번호 (예: 01012345678)"
+  inputmode="tel"
+  autocomplete="tel"
+/>
+
+<!-- 문자 전송 -->
+<button class="sms-button" id="sendButton" type="button">
+  📩 위치 링크 문자 보내기
+</button>
+
+<div class="footer">
+  ※ 문자전송 버튼은 휴대폰에서 눌러야 합니다
+</div>
+
+<br>
+
+<!-- 달콩이 이미지 -->
+<img
+  src="https://mudeung.github.io/rescue/logogomir1.png"
+  alt="달콩이 이미지"
+  style="display:block; margin:0 auto; max-width:100%; height:auto;"
+>
+
+<script>
+/* =========================================
+   링크 만료 확인 및 화면 처리
+========================================= */
+(function () {
+  if (!window.MUDEUNG_LINK_EXPIRED) {
+    return;
+  }
+
+  // 만료된 경우 암호 입력창을 열지 않음
+  document.body.classList.add("link-expired");
+
+  const panel = document.getElementById("passwordPanel");
+  const expiredPanel = document.getElementById("expiredPanel");
+
+  if (panel) {
+    panel.remove();
+  }
+
+  if (expiredPanel) {
+    expiredPanel.style.display = "block";
+  }
+})();
+
+
+/* =========================================
+   iPhone / Android 공통 문자 전송
+   링크 유효시간: 1시간
+========================================= */
+function sendSMS() {
+  if (window.MUDEUNG_LINK_EXPIRED) {
+    alert("링크 사용 기간이 만료되었습니다.");
+    return;
+  }
+
+  if (!document.body.classList.contains("password-verified")) {
+    alert("먼저 접속 암호를 확인해주세요.");
+    return;
+  }
+
+  const phoneInput = document.getElementById("phone");
+  const phone = phoneInput.value.trim();
+
+  if (!phone) {
+    alert("받는 사람 번호를 입력해주세요.");
+    phoneInput.focus();
+    return;
+  }
+
+  const normalizedPhone = phone.replace(/[\s()-]/g, "");
+
+  if (!/^\+?[0-9]{8,15}$/.test(normalizedPhone)) {
+    alert("전화번호를 올바르게 입력해주세요.");
+    phoneInput.focus();
+    return;
+  }
+
+  // 현재 시각부터 1시간 후 만료
+  const expires = Date.now() + 60 * 60 * 1000;
+
+  const link =
+    "https://mudeung.github.io/gps?expires=" + expires;
+
+  const message =
+    "[팔산 산악구조 요청]\n" +
+    "팔공산 구조대입니다. 링크를 클릭해 주세요.\n" +
+    link;
+
+  const encodedMessage = encodeURIComponent(message);
+
+  // iPhone / iPad 판별
+  const ua = navigator.userAgent;
+  const isIOS =
+    /iPhone|iPad|iPod/i.test(ua) ||
+    (navigator.platform === "MacIntel" &&
+     navigator.maxTouchPoints > 1);
+
+  // 운영체제별 SMS 주소 형식
+  const smsURL = isIOS
+    ? "sms:" + normalizedPhone + "&body=" + encodedMessage
+    : "sms:" + normalizedPhone + "?body=" + encodedMessage;
+
+  // 버튼 클릭 이벤트 안에서 문자 앱 열기
+  window.location.href = smsURL;
+}
+
+/* =========================================
+   문자 전송 버튼 이벤트 연결
+========================================= */
+document.getElementById("sendButton").addEventListener("click", function (event) {
+  event.preventDefault();
+  sendSMS();
+});
+     
+/* =========================================
+   우클릭 및 단축키 방지
+========================================= */
+document.addEventListener("contextmenu", function (event) {
+  event.preventDefault();
+});
+
+document.addEventListener("keydown", function (event) {
+  const key = event.key.toLowerCase();
+
+  if (
+    event.key === "F12" ||
+    (event.ctrlKey && ["u", "s"].includes(key)) ||
+    (event.ctrlKey && event.shiftKey && ["i", "j", "c"].includes(key))
+  ) {
+    event.preventDefault();
+  }
+});
+</script>
+
+</body>
+</html>
