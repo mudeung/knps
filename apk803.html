@@ -22,11 +22,18 @@ body:not(.password-verified):not(.link-expired) > :not(#passwordPanel):not(#expi
   visibility: hidden;
 }
 
-/* 암호 입력창 */
+/* 암호 입력창: 화면 정중앙 배치 */
 .password-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
   width: min(420px, calc(100% - 32px));
   max-width: 420px;
   padding: 26px;
+  box-sizing: border-box;
+
   border: 1px solid var(--border);
   border-radius: 18px;
   background: var(--surface);
