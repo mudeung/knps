@@ -430,26 +430,26 @@ try {
           }
         });
 
-        // 좌표를 별도 필드로도 저장
-        if (lat !== null && lng !== null) {
-          data.latitude = lat;
-          data.longitude = lng;
-        }
+        // 좌표는 coordinates 항목 하나만 표시
+delete data["사고좌표"];
+delete data.latitude;
+delete data.longitude;
 
-        // 기존 폼에 좌표 필드가 있다면 그 값도 보존
-        if ($("hiddenCoordinate")) {
-          data.coordinates = $("hiddenCoordinate").value;
-        }
-
+if ($("hiddenCoordinate")) {
+  delete data.coordinates;
+  data[""] = $("hiddenCoordinate").value;
+}
         const text = Object.entries(data)
-          .map(([key, value]) => {
-            const displayValue = Array.isArray(value)
-              ? value.join(", ")
-              : String(value ?? "");
+  .map(([key, value]) => {
+    const displayValue = Array.isArray(value)
+      ? value.join(", ")
+      : String(value ?? "");
 
-            return `${key}: ${displayValue}`;
-          })
-          .join("\n");
+    return key
+      ? `${key}: ${displayValue}`
+      : displayValue;
+  })
+  .join("\n");
 
         // 안전한 텍스트 출력: 사용자 입력을 HTML로 해석하지 않음
         const savedData = $("savedData");
