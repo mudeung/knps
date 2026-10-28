@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🚑 팔공산구조팀 구조출동 기록지</title>
+<title>🚑 팔공산 구조출동 기록지</title>
 
 <!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -111,7 +111,7 @@ button{
  
 <div class="container mx-auto max-w-2xl p-4">
 
-  <h2 class="header">🚑 팔공산구조팀 출동 기록지</h2>
+  <h2 class="header">🚑 팔공산 구조출동 기록지</h2>
 
   <!-- 달콩이 이미지 -->
 <img src="https://mudeung.github.io/rescue/logogomir1.png"
@@ -354,7 +354,7 @@ try {
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({
-          title: "무등산 구조 기록",
+          title: "팔공산 구조출동 기록",
           text: text
         });
         return;
@@ -477,7 +477,7 @@ if ($("hiddenCoordinate")) {
             // 브라우저에서 직접 확인할 수 없음
            setStatus(
   "기록 전송 요청을 보냈습니다. " +
-  "Google 스프레드시트에서 저장 여부를 확인해 주세요."
+  "서버에서 저장 여부를 확인해 주세요."
 );
           })
           .catch((error) => {
