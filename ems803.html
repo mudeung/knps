@@ -248,9 +248,10 @@ button{
             return;
           }
 
-          const mapPosition = new kakao.maps.LatLng(lat, lng);
+          
+const mapPosition = new kakao.maps.LatLng(lat, lng);
 
-        if (!map) {
+if (!map) {
   map = new kakao.maps.Map(mapElement, {
     center: mapPosition,
     level: 3
@@ -264,6 +265,7 @@ button{
   map.setCenter(mapPosition);
   marker.setPosition(mapPosition);
 }
+
 
           setStatus("현재 위치와 지도를 확인했습니다.");
           locationButton.disabled = false;
@@ -456,15 +458,19 @@ button{
 
         // 공유 버튼의 사용자 동작이 유효하도록
         // 네트워크 요청을 기다리지 않고 공유를 시작
-        void shareRecord(text);
+        shareRecord(text).catch((error) => {
+  console.error("기록 공유 오류:", error);
+  setStatus("공유 중 오류가 발생했습니다. 기록 파일을 다운로드합니다.");
+  downloadRecord(text);
+});
 
         sendToGoogleSheet(data)
           .then(() => {
             // no-cors 응답은 opaque이므로 서버 저장 성공을
             // 브라우저에서 직접 확인할 수 없음
             setStatus(
-  "기록을 전송했습니다. 실제 저장 여부는 " +
-  "Google 스프레드시트에서 확인해 주세요."
+  "기록 전송 요청을 완료했습니다. " +
+  "실제 저장 여부는 Google 스프레드시트에서 확인해 주세요."
 );
           })
           .catch((error) => {
