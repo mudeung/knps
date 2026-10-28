@@ -248,22 +248,22 @@ button{
             return;
           }
 
-          const position = new kakao.maps.LatLng(lat, lng);
+          const mapPosition = new kakao.maps.LatLng(lat, lng);
 
-          if (!map) {
-            map = new kakao.maps.Map(mapElement, {
-              center: position,
-              level: 3
-            });
+        if (!map) {
+  map = new kakao.maps.Map(mapElement, {
+    center: mapPosition,
+    level: 3
+  });
 
-            marker = new kakao.maps.Marker({
-              position: position,
-              map: map
-            });
-          } else {
-            map.setCenter(position);
-            marker.setPosition(position);
-          }
+  marker = new kakao.maps.Marker({
+    position: mapPosition,
+    map: map
+  });
+} else {
+  map.setCenter(mapPosition);
+  marker.setPosition(mapPosition);
+}
 
           setStatus("현재 위치와 지도를 확인했습니다.");
           locationButton.disabled = false;
@@ -463,9 +463,9 @@ button{
             // no-cors 응답은 opaque이므로 서버 저장 성공을
             // 브라우저에서 직접 확인할 수 없음
             setStatus(
-              "기록이 화면에 저장되었습니다. " +
-              "시트 저장 여부는 Google 스프레드시트에서 확인해 주세요."
-            );
+  "기록을 전송했습니다. 실제 저장 여부는 " +
+  "Google 스프레드시트에서 확인해 주세요."
+);
           })
           .catch((error) => {
             console.error("Google Sheets 전송 오류:", error);
