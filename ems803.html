@@ -249,52 +249,66 @@ button{
           }
 
           
+
 const mapPosition = new kakao.maps.LatLng(lat, lng);
 
-if (!map) {
-  map = new kakao.maps.Map(mapElement, {
-    center: mapPosition,
-    level: 3
-  });
+try {
+  if (!map) {
+    map = new kakao.maps.Map(mapElement, {
+      center: mapPosition,
+      level: 3
+    });
 
-  marker = new kakao.maps.Marker({
-    position: mapPosition,
-    map: map
-  });
-} else {
+    marker = new kakao.maps.Marker({
+      position: mapPosition,
+      map: map
+    });
+  } else {
+    map.setCenter(mapPosition);
+    marker.setPosition(mapPosition);
+  }
+
+  // 지도 크기 및 위치 갱신
+  map.relayout();
   map.setCenter(mapPosition);
-  marker.setPosition(mapPosition);
+
+  setStatus("현재 위치와 지도를 확인했습니다.");
+
+} catch (error) {
+  console.error("카카오맵 오류:", error);
+  setStatus("GPS 좌표는 확인했지만 지도 표시 중 오류가 발생했습니다.");
+
+} finally {
+  locationButton.disabled = false;
 }
 
+},
 
-          setStatus("현재 위치와 지도를 확인했습니다.");
-          locationButton.disabled = false;
-        },
+(error) => {
+  const messages = {
+    1: "위치 권한이 거부되었습니다. 브라우저 설정을 확인해 주세요.",
+    2: "현재 위치를 확인할 수 없습니다. GPS 설정을 확인해 주세요.",
+    3: "위치 확인 시간이 초과되었습니다. 다시 시도해 주세요."
+  };
 
-        (error) => {
-          const messages = {
-            1: "위치 권한이 거부되었습니다. 브라우저 설정을 확인해 주세요.",
-            2: "현재 위치를 확인할 수 없습니다. GPS 설정을 확인해 주세요.",
-            3: "위치 확인 시간이 초과되었습니다. 다시 시도해 주세요."
-          };
+  const message =
+    messages[error.code] ||
+    `GPS 오류: ${error.message}`;
 
-          const message =
-            messages[error.code] ||
-            `GPS 오류: ${error.message}`;
+  setStatus(message);
+  alert(message);
+  locationButton.disabled = false;
+},
 
-          setStatus(message);
-          alert(message);
-          locationButton.disabled = false;
-        },
+{
+  enableHighAccuracy: true,
+  timeout: 20000,
+  maximumAge: 0
+}
+);
+});
+}
 
-        {
-          enableHighAccuracy: true,
-          timeout: 15000,
-          maximumAge: 0
-        }
-      );
-    });
-  }
 
   /* =========================
      2. 기록을 텍스트 파일로 저장
