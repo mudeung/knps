@@ -430,13 +430,6 @@ try {
           }
         });
 
-        const gcsElement = $("gcsResult");
-        const gcs = gcsElement
-          ? gcsElement.textContent.trim()
-          : "";
-
-        data.GCS = gcs;
-
         // 좌표를 별도 필드로도 저장
         if (lat !== null && lng !== null) {
           data.latitude = lat;
